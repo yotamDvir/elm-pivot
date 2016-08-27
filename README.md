@@ -20,12 +20,12 @@ and many more.
 Consider the following model and update:
 
 ```elm
-type alias Counters =
+type alias Model =
   { counter1 : Int
   , counter2 : Int
   }
 
-init : Counters
+init : Model
 init =
   { counter1 = 0
   , counter2 = 0
@@ -36,6 +36,7 @@ type Msg
   | Inc1
   | Inc2
 
+update : Msg -> Model -> Model
 update msg model =
   case msg of
     Inc1 ->
