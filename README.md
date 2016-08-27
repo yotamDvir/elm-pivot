@@ -60,17 +60,19 @@ type alias Counters =
   , counter2 : Int
   }
 
+initRec : Counters
 initRec =
   { counter1 = 0
   , counter2 = 0
   }
 
--- This was the update functionality before.
 type RecMsg
   = NoOp
   | Inc1
   | Inc2
 
+-- This was the update function before.
+updateRec : RecMsg -> Counters -> Counters
 updateRec msgRec rec =
   case msgRec of
     Inc1 ->
@@ -80,8 +82,10 @@ updateRec msgRec rec =
     NoOp ->
       rec
 
--- Now we wrap it with a `Pivot`.
-init : Pivot Counters
+-- Now we wrap it all in a pivot.
+type alias Model = Pivot Counters
+
+init : Model
 init =
   initRec
   |> P.pure
@@ -91,6 +95,7 @@ type Msg
   | Undo
   | Redo
 
+update : Msg -> Model -> Model
 update msg model =
   case msg of
     Undo ->
@@ -101,12 +106,12 @@ update msg model =
       |> P.withRollback P.goR
     New msgRec ->
       let
-        -- we take the current state and update it, using the "regular" update.
+        -- Creating the next state.
         next =
           P.getC model
           |> updateRec msgRec
       in
-        -- we add the next state to the pivot
+        -- Adding the next state.
         model
         |> P.addGoR next
 ```
