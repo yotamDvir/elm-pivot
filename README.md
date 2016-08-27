@@ -292,7 +292,7 @@ want to move about the genetic code a single nucleotide at a time.
 -- Reading genetic code, with a generalized pivot.
 type Nucleotide = A | T | G | C
 type alias Codon = (Nucleotide, Nucleotide, Nucleotide)
-fromL (n1, n2, n3) n = (n, n1, n2)
+fromL n (n1, n2, n3) = (n, n1, n2)
 toR (n1, n2, n3) = n3
 type alias GeneticCode = GeneralizedPivot fromL toR Codon Nucleotide
 ```
