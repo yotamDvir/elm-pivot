@@ -127,12 +127,14 @@ Below is just one possible implementation.
 ```elm
 import Pivot as P exposing (Pivot)
 
-type alias Counters =
-  { counter1 : Pivot Int
+type alias Counter1Model = Pivot Int
+
+type alias Model =
+  { counter1 : Counter1Model
   , counter2 : Int
   }
 
-init : Counters
+init : Model
 init =
   { counter1 = P.pure 0
   , counter2 = 0
@@ -142,6 +144,7 @@ type Msg
   = Counter1 Counter1Msg
   | Counter2
 
+update : Msg -> Model -> Model
 update msg model =
   case msg of
     Counter1 counter1Msg ->
@@ -153,8 +156,7 @@ update msg model =
     Counter2 ->
       { model
       | counter2 =
-        model.counter2
-        |> (+) 1
+        model.counter2 + 1
       }
 
 type Counter1Msg
@@ -162,13 +164,13 @@ type Counter1Msg
   | Undo
   | Redo
 
+counter1Update : Counter1Msg -> Counter1Model -> Counter1Model
 counter1Update counter1Msg counter1 =
   case counter1Msg of
     Inc ->
       let
         next =
-          P.getC counter1
-          |> (+) 1
+          P.getC counter1 + 1
       in
         counter1
         |> P.addGoR next
