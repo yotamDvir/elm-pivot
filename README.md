@@ -294,6 +294,7 @@ type Nucleotide = A | T | G | C
 type alias Codon = (Nucleotide, Nucleotide, Nucleotide)
 fromL n (n1, n2, n3) = (n, n1, n2)
 toR (n1, n2, n3) = n3
+reverseC (n1, n2, n3) = (n3, n2, n1)
 type alias GeneticCode = GeneralizedPivot fromL toR Codon Nucleotide
 ```
 
