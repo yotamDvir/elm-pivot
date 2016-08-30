@@ -34,7 +34,7 @@ So you want to use a pivot? Better know how to create one, and get stuff back!
 # Movement
 Handle the position of the center.
 These functions do not mutate the underlying list.
-That is, if you apply functions fromList here and then apply `getA`,
+That is, if you apply functions from here and then apply `getA`,
 you'd get the same thing you would by applying `getA` beforehand.
 
 ## Position
@@ -110,7 +110,7 @@ import Pivot.Utilities as Utilities
 type alias Pivot a = Pivot.Types.Pivot a
 
 
-{-| Make a pivot fromList a list with empty left side.
+{-| Make a pivot from a list with empty left side.
 
 _Fails if and only if the list given is empty._
 
@@ -261,7 +261,7 @@ goBy : Int -> Pivot a -> Maybe (Pivot a)
 goBy = Position.goBy
 
 
-{-| Go to a specific position fromList the left. Starts with 0.
+{-| Go to a specific position from the left. Starts with 0.
 
 _Fails if and only if the position given doesn't exist._
 -}
@@ -285,13 +285,13 @@ goToEnd : Pivot a -> Pivot a
 goToEnd = Position.goToEnd
 
 
-{-| Position fromList the left side. Starts with 0.
+{-| Position from the left side. Starts with 0.
 -}
 lengthL : Pivot a -> Int
 lengthL = Position.lengthL
 
 
-{-| Position fromList the right side. Starts with 0.
+{-| Position from the right side. Starts with 0.
 -}
 lengthR : Pivot a -> Int
 lengthR = Position.lengthR
