@@ -50,7 +50,7 @@ mapS =
 
 mapCLR' : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
 mapCLR' onC' onL' onR' pvt =
-  Pivot (pvt |> getC |> onC') (pvt |> getL |> onL', pvt |> getR |> onR')
+  Pivot (pvt |> getC |> onC') (pvt |> getL |> onL' |> List.reverse, pvt |> getR |> onR')
 
 
 mapCRL' : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
