@@ -5,6 +5,7 @@ module Pivot.Map exposing
 import Pivot.Types exposing (..)
 import Pivot.Utilities exposing (..)
 import Pivot.Get exposing (..)
+import Pivot.Position exposing (..)
 
 
 mapCLR : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
@@ -77,6 +78,21 @@ mapR' f =
 mapS' : (List a -> List a) -> Pivot a -> Pivot a
 mapS' =
   mapCS' identity
+
+
+zip : Pivot a -> Pivot (Int, a)
+zip pvt =
+  let
+    n =
+      lengthL pvt
+    onC =
+      (,) n
+    onL =
+      List.indexedMap (,)
+    onR =
+      List.indexedMap ((+) (n+1) >> (,))
+  in
+    mapCLR' onC onL onR pvt
 
 
 apply : Pivot (a -> b) -> Pivot a -> Pivot b

@@ -1,5 +1,5 @@
 {
-    "version": "1.0.3",
+    "version": "1.1.0",
     "summary": "Pivot: a list with a cursor pointing at the center, like a zipper.",
     "repository": "https://github.com/yotamDvir/elm-pivot.git",
     "license": "BSD3",

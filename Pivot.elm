@@ -88,7 +88,7 @@ Just add `'` to a `map*` function to use functions on lists instead of values.
 @docs mapCLR', mapCRL', mapCS', mapS', mapL', mapR'
 
 ## Special
-@docs apply
+@docs zip, apply
 
 # Utilities
 @docs reverse, mirror, mirrorM, assert, withRollback
@@ -489,6 +489,13 @@ mapR' = Map.mapR'
 -}
 mapS' : (List a -> List a) -> Pivot a -> Pivot a
 mapS' = Map.mapS'
+
+
+{-| Adds indices to the values.
+Based internally on `List.indexedMap`.
+-}
+zip : Pivot a -> Pivot (Int, a)
+zip = Map.zip
 
 
 {-| Apply functions in a pivot on values in another Pivot.
