@@ -1,23 +1,102 @@
 # Pivot, the data structure
 
-Pivot upgrades a list to a list with a center, left and right. You can think
-of it as a list with a cursor pointing at some value inside it, or better yet,
-a list with a location acting as a pivot.
-This structure makes a lot of sense when you want functionality such as
+Pivot upgrades a list to a list with a center, left and right. You can think of it as a list with a cursor pointing at some value inside it, or better yet, a list with a location acting as a pivot. This structure makes a lot of sense when you want functionality such as
 
 * scrolling through a list, e.g. a playlist,
-* undo and redo, where the left holds previous states,
-and the right holds future states (after you did some undos),
-* control focus of form elements (although you'd need to be clever
-about it, to account for when no element is in focus),
+* undo and redo, where the left holds previous states, and the right holds future states (after you did some undos),
+* control focus of form elements (although you'd need to be clever about it, to account for when no element is in focus),
+* and many more.
 
-and many more.
+## What if my list is empty?
 
-## Examples
+Alright, slight lie earlier. Pivot actually upgrades a cons list (a non-empty list).
+You can try to upgrade a list, but it may fail. Explicitly, consider the
+following functions from this library,
 
-### Undo
+```elm
+from : List a -> Maybe (Pivot a)
+```
 
-Consider the following model and update:
+```elm
+fromCons : a -> List a -> Pivot a
+```
+
+# Examples
+
+## Browsing
+
+A pivot is perfect for implementing a collection browser (e.g. of a music playlist).
+
+```elm
+import Pivot as P exposing (Pivot)
+
+type alias Model = Maybe (Pivot Artist)
+
+type alias Artist = String
+
+-- We start without any artists.
+init : Model
+init =
+  Nothing
+
+type Msg
+  = Next
+  | Previous
+  | Remove
+  | Add Artist
+  | MoveItemUp
+  | MoveItemDown
+  -- etc...
+
+update : Msg -> Model -> Model
+update msg model =
+  case msg of
+    Next ->
+      model
+      -- Attempt to go forward, rollback if can't.
+      |> Maybe.map (P.withRollback P.goR)
+    Previous ->
+      model
+      -- Attempt to go back, rollback if can't.
+      |> Maybe.map (P.withRollback P.goL)
+    Remove ->
+      -- Attempt to remove and go backwards.
+      -- Will fail if there is no backwards to go to.
+      case model `Maybe.andThen` P.removeGoL of
+        Just collection ->
+          Just collection
+        Nothing ->
+          -- Attempt to remove and go forward otherwise.
+          -- Upon failure, there is nowhere to go, so Nothing is OK.
+          model `Maybe.andThen` P.removeGoR
+    Add item ->
+      model
+      -- Attempt to add to an existing collection.
+      |> Maybe.map (P.addGoR item)
+      -- Start from scratch otherwise.
+      |> Maybe.withDefault (P.pure item)
+      -- Wrap back into a `Maybe`.
+      |> Just
+    MoveItemUp ->
+      model
+      -- Attempt to move item forward.
+      -- If it can't (no item in front), do nothing.
+      |> Maybe.map (P.withRollback P.switchR)
+    MoveItemDown ->
+      model
+      -- Attempt to move item backwards.
+      -- If it can't (no item behind), do nothing.
+      |> Maybe.map (P.withRollback P.switchL)
+    -- etc...
+```
+
+## Focus
+
+Can you imagine how this library can be used to hold a bunch of input fields' values, with one of the fields in focus? Thinking about the fields as a collection, it is exactly like the browser from before.
+
+## Undo
+
+This library can be used to add an undo-redo functionality to your app. Consider an simple app like this:
 
 ```elm
 type alias Model =
@@ -47,9 +126,7 @@ update msg model =
       model
 ```
 
-We decide that we want the user to be able to undo changes to the counters.
-We modify our model and update so that instead of replacing the model
-with the next version, we add it to a pivot that contains all versions.
+We decide that we want the user to be able to undo changes to the counters. To accomplish this, we add each new version of the model to a pivot instead of modifying it in place. This way we retain previous models, and can simply browse between them back and forth.
 
 ```elm
 import Pivot as P exposing (Pivot)
@@ -100,29 +177,28 @@ update msg model =
   case msg of
     Undo ->
       model
+      -- Try to undo.
+      -- If there's no previous state, do nothing.
       |> P.withRollback P.goL
     Redo ->
       model
+      -- Try to undo.
+      -- If there's no next state, do nothing.
       |> P.withRollback P.goR
     New msgRec ->
       let
-        -- Creating the next state.
         next =
+          -- Getting the current state.
           P.getC model
+          -- Updating from it using the message.
           |> updateRec msgRec
       in
-        -- Adding the next state.
         model
+        -- Adding the next state (instead of replacing the current one).
         |> P.addGoR next
 ```
 
-_Note: undoing here is trying to go left, but if it fails we rollback to
-no doing anything, which makes sense if there is nowhere to go back to._
-
-So we have undo, but we're recording every single state of the model.
-What if we only want part of the model to be undoable,
-say just the first counter?
-Below is just one possible implementation.
+So we have undo, but we're recording every single state of the model. What if we only want part of the model to be undoable, say just the first counter? Below is just one possible implementation. I'll let you to try to make sense of it yourself.
 
 ```elm
 import Pivot as P exposing (Pivot)
@@ -182,111 +258,19 @@ counter1Update counter1Msg counter1 =
       |> P.withRollback P.goR
 ```
 
-### Browsing
+# Alternatives
 
-A pivot is perfect for browsing some collection.
+* The [undo-redo](http://package.elm-lang.org/packages/elm-community/undo-redo) library holds all states in a Pivot-like structure and lets you undo and redo through them. It is actually very similar to this library, but exposes less methods, and is semantically odd to use when doing anything that isn't undo/redo.
+* The [elm-multiway-tree-zipper](http://package.elm-lang.org/packages/tomjkidd/elm-multiway-tree-zipper/) library is much closer to the [zipper](http://learnyouahaskell.com/zippers) from Haskell, and provides a much more extensive structure, but exposes much less methods, and is unnecessarily complicated if you are dealing with a structure that resembles a list and not a tree.
+* The [listzipper](http://package.elm-lang.org/packages/wernerdegroot/listzipper/) library exposes the same structure, but has only a handful of methods and at the time of writing is not up to date with the most recent version of Elm.
 
-```elm
-import Pivot as P exposing (Pivot)
+# What's next
 
-type alias Model = Maybe (Pivot Artist)
+## Generalizations
 
-type alias Artist = String
+Right now the center must have the same type as the members of the sides. One possible generalization is to let the center have any arbitrary type, but then the pivot will need to be equipped with transformation functions for moving the member from the sides to the center and vice-verse.
 
--- We start without any artists.
-init : Model
-init =
-  Nothing
-
-type Msg
-  = Next
-  | Previous
-  | Remove
-  | Add Artist
-  | MoveItemUp
-  | MoveItemDown
-  -- etc...
-
-update : Msg -> Model -> Model
-update msg model =
-  case msg of
-    Next ->
-      -- Attempt to go forward, rollback if can't.
-      model
-      |> Maybe.map (P.withRollback P.goR)
-    Previous ->
-      -- Attempt to go back, rollback if can't.
-      model
-      |> Maybe.map (P.withRollback P.goL)
-    Remove ->
-      case model `Maybe.andThen` P.removeGoL of -- Attempt to go back after.
-        Just collection ->
-          Just collection
-        Nothing ->
-          model `Maybe.andThen` P.removeGoR -- Attempt to go forward otherwise.
-    Add item ->
-      model
-      |> Maybe.map (P.addGoR item) -- Attempt to add to an existing collection.
-      |> Maybe.withDefault (P.pure item) -- Start from scratch otherwise.
-      |> Just -- Make the collection a `Maybe` again.
-    MoveItemUp ->
-      -- Attempt to move item up, rollback if can't.
-      model
-      |> Maybe.map (P.withRollback P.switchR)
-    MoveItemDown ->
-      -- Attempt to move item down, rollback if can't.
-      model
-      |> Maybe.map (P.withRollback P.switchL)
-    -- etc...
-```
-
-### Focus
-
-Can you imagine how this library can be used to hold a bunch of
-input fields' values, with one of the fields in focus?
-
-## Alternatives
-
-* The [undo-redo](http://package.elm-lang.org/packages/elm-community/undo-redo)
-library holds all states in a Pivot-like structure and
-lets you undo and redo through them.
-It is actually very similar to this library, but exposes less methods,
-and is semantically odd to use when doing anything that isn't undo/redo.
-* The [elm-multiway-tree-zipper](http://package.elm-lang.org/packages/tomjkidd/elm-multiway-tree-zipper/)
-library is much closer to the [zipper](http://learnyouahaskell.com/zippers) from
-Haskell, and provides a much more extensive structure, but exposes much
-less methods, and is unnecessarily complicated if you are dealing with
-a structure that resembles a list and not a tree.
-* The [listzipper](http://package.elm-lang.org/packages/wernerdegroot/listzipper/)
-library exposes the same structure, but has only a handful of methods and
-at the time of writing is not up to date with the most recent version of Elm.
-
-## What if my list is empty?
-
-Well, we lied before. Pivot actually upgrades a cons list (a non-empty list).
-You can try to upgrade a list, but it may fail. Explicitly, consider the
-following functions from this library,
-
-```elm
-from : List a -> Maybe (Pivot a)
-```
-
-```elm
-fromCons : a -> List a -> Pivot a
-```
-
-## What's next
-
-### Generalizations
-
-Right now the center must have the same type as the members of the sides.
-One possible generalization is to let the center have any arbitrary type,
-but then the pivot will need to be equipped with transformation functions
-for moving the member from the sides to the center and vice-verse.
-
-For example, you may want to use a pivot to observe codons inside genetic
-code, but a codon is a 3-tuple of nucleotides, while you may
-want to move about the genetic code a single nucleotide at a time.
+For example, you may want to use a pivot to observe codons inside genetic code, but a codon is a 3-tuple of nucleotides, while you may want to move about the genetic code a single nucleotide at a time.
 
 ```elm
 -- Reading genetic code, with a generalized pivot.
@@ -295,14 +279,11 @@ type alias Codon = (Nucleotide, Nucleotide, Nucleotide)
 fromL n (n1, n2, n3) = (n, n1, n2)
 toR (n1, n2, n3) = n3
 reverseC (n1, n2, n3) = (n3, n2, n1)
-type alias GeneticCode = GeneralizedPivot fromL toR Codon Nucleotide
+type alias GeneticCode = GeneralizedPivot fromL toR reverseC Codon Nucleotide
 ```
 
-If this or any other generalization are wanted,
-please post an issue in the repository.
-Even better, help create it!
+If this or any other generalization are wanted, please post an issue in the repository. Even better, help create it!
 
-### More methods
+## More methods
 
-If you feel this library is lacking a method you think would rock,
-please post an issue in the repository.
+If you feel this library is lacking a method you think would rock, please post an issue in the repository.
