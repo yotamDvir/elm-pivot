@@ -1,11 +1,11 @@
 port module Main exposing (..)
 
 import Tests
-import Test.Runner.Node exposing (run)
+import Test.Runner.Node exposing (TestProgram, run)
 import Json.Encode exposing (Value)
 
 
-main : Program Never
+main : TestProgram
 main =
     run emit Tests.all
 

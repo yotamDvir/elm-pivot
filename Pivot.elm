@@ -1,6 +1,4 @@
-module Pivot exposing
-  (..)
-
+module Pivot exposing (..)
 
 {-| A pivot is a list upgraded with a center and sides. However, a pivot
 can never be empty, so it is better to think of it an upgraded cons list.
@@ -26,7 +24,7 @@ For example, `getL` gets the left side of a pivot.
 So you want to use a pivot? Better know how to create one, and get stuff back!
 
 ## Create
-@docs fromList, fromCons, pure
+@docs fromList, fromCons, singleton
 
 ## Get
 @docs getC, getL, getR, getA, hasL, hasR
@@ -84,8 +82,8 @@ then you must retain the type.
 ## As a whole
 Some `List a -> List a` functions cannot be made from `a -> a` functions.
 This is why these maps may be of importance.
-Just add `'` to a `map*` function to use functions on lists instead of values.
-@docs mapCLR', mapCRL', mapCS', mapS', mapL', mapR'
+Just add `_` to a `map*` function to use functions on lists instead of values.
+@docs mapCLR_, mapCRL_, mapCS_, mapS_, mapL_, mapR_
 
 ## Special
 @docs zip, apply
@@ -93,7 +91,6 @@ Just add `'` to a `map*` function to use functions on lists instead of values.
 # Utilities
 @docs reverse, mirror, mirrorM, assert, withRollback
 -}
-
 
 import Pivot.Types
 import Pivot.Create as Create
@@ -107,7 +104,8 @@ import Pivot.Utilities as Utilities
 
 {-| Pivot is an opaque data type.
 -}
-type alias Pivot a = Pivot.Types.Pivot a
+type alias Pivot a =
+    Pivot.Types.Pivot a
 
 
 {-| Make a pivot from a list with empty left side.
@@ -117,7 +115,8 @@ _Fails if and only if the list given is empty._
     fromList [] == Nothing
 -}
 fromList : List a -> Maybe (Pivot a)
-fromList = Create.fromList
+fromList =
+    Create.fromList
 
 
 {-| Like `fromList`, but by specifying the center explicitly, it cannot fail.
@@ -128,53 +127,61 @@ fromList = Create.fromList
     Just (fromCons 1 [2..4]) == fromList [1..4]
 -}
 fromCons : a -> List a -> Pivot a
-fromCons = Create.fromCons
+fromCons =
+    Create.fromCons
 
 
 {-| Like `fromCons`, but without the list. That is, we specify only the center.
 
-    pure == flip fromCons []
+    singleton == flip fromCons []
 -}
-pure : a -> Pivot a
-pure = Create.pure
+singleton : a -> Pivot a
+singleton =
+    Create.singleton
 
 
 {-| Get the center member.
 
-    pure >> getC == identity
+    singleton >> getC == identity
 -}
 getC : Pivot a -> a
-getC = Get.getC
+getC =
+    Get.getC
 
 
 {-| Get the left side list.
 -}
 getL : Pivot a -> List a
-getL = Get.getL
+getL =
+    Get.getL
 
 
 {-| Get the right side list.
 -}
 getR : Pivot a -> List a
-getR = Get.getR
+getR =
+    Get.getR
 
 
 {-| Make the pivot into a list.
 -}
 getA : Pivot a -> List a
-getA = Get.getA
+getA =
+    Get.getA
 
 
 {-| Check if the left side is not empty.
 -}
 hasL : Pivot a -> Bool
-hasL = Get.hasL
+hasL =
+    Get.hasL
 
 
 {-| Check if the right side is not empty.
 -}
 hasR : Pivot a -> Bool
-hasR = Get.hasR
+hasR =
+    Get.hasR
 
 
 {-| Find the first member of a pivot satisfying some predicate.
@@ -182,7 +189,8 @@ hasR = Get.hasR
 _Fails if and only if there are no such members._
 -}
 firstWith : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
-firstWith = Find.firstWith
+firstWith =
+    Find.firstWith
 
 
 {-| Find the last member of a pivot satisfying some predicate.
@@ -190,17 +198,19 @@ firstWith = Find.firstWith
 _Fails if and only if there are no such members._
 -}
 lastWith : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
-lastWith = Find.lastWith
+lastWith =
+    Find.lastWith
 
 
 {-| Find the first member to the center's right satisfying some predicate.
 
 _Fails if and only if there are no such members._
 
-    findR ((==) 3) (fromCons 1 [2..4]) == (pure 3 |> setL [1, 2] |> setR [4])
+    findR ((==) 3) (fromCons 1 [2..4]) == (singleton 3 |> setL [1, 2] |> setR [4])
 -}
 findR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
-findR = Find.findR
+findR =
+    Find.findR
 
 
 {-| Find the first member to the center's left satisfying some predicate.
@@ -208,7 +218,8 @@ findR = Find.findR
 _Fails if and only if there are no such members._
 -}
 findL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
-findL = Find.findL
+findL =
+    Find.findL
 
 
 {-| Like `findR`, but checks the center first as well.
@@ -218,7 +229,8 @@ _Fails if and only if there are no such members._
     firstWith == \pred -> goToStart >> findCR pred
 -}
 findCR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
-findCR = Find.findCR
+findCR =
+    Find.findCR
 
 
 {-| Like `findL`, but checks the center first as well.
@@ -226,7 +238,8 @@ findCR = Find.findCR
 _Fails if and only if there are no such members._
 -}
 findCL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
-findCL = Find.findCL
+findCL =
+    Find.findCL
 
 
 {-| Move one step right.
@@ -239,7 +252,8 @@ and instead have a possible no-op. See __Utilities__.
     fromCons 1 [2..4] |> goR /= Nothing
 -}
 goR : Pivot a -> Maybe (Pivot a)
-goR = Position.goR
+goR =
+    Position.goR
 
 
 {-| Move one step left.
@@ -250,7 +264,8 @@ _Fails if and only if the left side is empty._
     withRollback goL (fromCons 1 [2..4]) == fromCons 1 [2..4]
 -}
 goL : Pivot a -> Maybe (Pivot a)
-goL = Position.goL
+goL =
+    Position.goL
 
 
 {-| Move right by some number of steps. Negative number moves left instead.
@@ -258,7 +273,8 @@ goL = Position.goL
 _Fails if and only if the movement goes out of bounds._
 -}
 goBy : Int -> Pivot a -> Maybe (Pivot a)
-goBy = Position.goBy
+goBy =
+    Position.goBy
 
 
 {-| Go to a specific position from the left. Starts with 0.
@@ -266,7 +282,8 @@ goBy = Position.goBy
 _Fails if and only if the position given doesn't exist._
 -}
 goTo : Int -> Pivot a -> Maybe (Pivot a)
-goTo = Position.goTo
+goTo =
+    Position.goTo
 
 
 {-| Go to starting position.
@@ -274,7 +291,8 @@ goTo = Position.goTo
     goToStart >> lengthL == 0
 -}
 goToStart : Pivot a -> Pivot a
-goToStart = Position.goToStart
+goToStart =
+    Position.goToStart
 
 
 {-| Go to starting position.
@@ -282,19 +300,22 @@ goToStart = Position.goToStart
     goToEnd >> lengthR == 0
 -}
 goToEnd : Pivot a -> Pivot a
-goToEnd = Position.goToEnd
+goToEnd =
+    Position.goToEnd
 
 
 {-| Position from the left side. Starts with 0.
 -}
 lengthL : Pivot a -> Int
-lengthL = Position.lengthL
+lengthL =
+    Position.lengthL
 
 
 {-| Position from the right side. Starts with 0.
 -}
 lengthR : Pivot a -> Int
-lengthR = Position.lengthR
+lengthR =
+    Position.lengthR
 
 
 {-| Length of the pivot.
@@ -302,25 +323,29 @@ lengthR = Position.lengthR
     lengthA == \p -> lengthL p + 1 + lengthR p
 -}
 lengthA : Pivot a -> Int
-lengthA = Position.lengthA
+lengthA =
+    Position.lengthA
 
 
 {-| Replace the center.
 -}
 setC : a -> Pivot a -> Pivot a
-setC = Modify.setC
+setC =
+    Modify.setC
 
 
 {-| Replace the left.
 -}
 setL : List a -> Pivot a -> Pivot a
-setL = Modify.setL
+setL =
+    Modify.setL
 
 
 {-| Replace the right.
 -}
 setR : List a -> Pivot a -> Pivot a
-setR = Modify.setR
+setR =
+    Modify.setR
 
 
 {-| Switch places with member nearest to the left
@@ -328,7 +353,8 @@ setR = Modify.setR
 _Fails if and only if left side is empty_
 -}
 switchL : Pivot a -> Maybe (Pivot a)
-switchL = Modify.switchL
+switchL =
+    Modify.switchL
 
 
 {-| Switch places with member nearest to the right
@@ -336,14 +362,17 @@ switchL = Modify.switchL
 _Fails if and only if right side is empty_
 -}
 switchR : Pivot a -> Maybe (Pivot a)
-switchR = Modify.switchR
+switchR =
+    Modify.switchR
+
 
 {-| Replace center with member nearest to the left.
 
 _Fails if and only if left side is empty._
 -}
 removeGoL : Pivot a -> Maybe (Pivot a)
-removeGoL = Modify.removeGoL
+removeGoL =
+    Modify.removeGoL
 
 
 {-| Replace center with member nearest to the right.
@@ -351,19 +380,22 @@ removeGoL = Modify.removeGoL
 _Fails if and only if right side is empty._
 -}
 removeGoR : Pivot a -> Maybe (Pivot a)
-removeGoR = Modify.removeGoR
+removeGoR =
+    Modify.removeGoR
 
 
 {-| Add a member to the left of the center
 -}
 addL : a -> Pivot a -> Pivot a
-addL = Modify.addL
+addL =
+    Modify.addL
 
 
 {-| Add a member to the right of the center
 -}
 addR : a -> Pivot a -> Pivot a
-addR = Modify.addR
+addR =
+    Modify.addR
 
 
 {-| Add a member to the left of the center and immediately move left.
@@ -373,13 +405,15 @@ We know that `addL >> goL` cannot really fail, but it still results in a
     addGoL >> Just == addL >> goL
 -}
 addGoL : a -> Pivot a -> Pivot a
-addGoL = Modify.addGoL
+addGoL =
+    Modify.addGoL
 
 
 {-| Add a member to the right of the center and immediately move right.
 -}
 addGoR : a -> Pivot a -> Pivot a
-addGoR = Modify.addGoR
+addGoR =
+    Modify.addGoR
 
 
 {-| Sort a pivot while keeping the center as center.
@@ -390,7 +424,8 @@ It does not simply sort each side separately!
     getC == sort >> getC
 -}
 sort : Pivot comparable -> Pivot comparable
-sort = Modify.sort
+sort =
+    Modify.sort
 
 
 {-| Like `sort`, but with a costum comparator.
@@ -398,7 +433,8 @@ sort = Modify.sort
     sort == sortWith compare
 -}
 sortWith : (a -> a -> Order) -> Pivot a -> Pivot a
-sortWith = Modify.sortWith
+sortWith =
+    Modify.sortWith
 
 
 {-| Provide functions that control what happens to the center,
@@ -406,19 +442,22 @@ the left members and the right member separately,
 and get a function that acts on pivots.
 -}
 mapCLR : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
-mapCLR = Map.mapCLR
+mapCLR =
+    Map.mapCLR
 
 
 {-| Like `mapCLR`, but provide the function for the right before the left.
 -}
 mapCRL : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
-mapCRL = Map.mapCRL
+mapCRL =
+    Map.mapCRL
 
 
 {-| Like `mapCLR`, but you provide one function for both sides.
 -}
 mapCS : (a -> b) -> (a -> b) -> Pivot a -> Pivot b
-mapCS = Map.mapCS
+mapCS =
+    Map.mapCS
 
 
 {-| Like `mapCS`, but you provide one function for all members.
@@ -427,75 +466,87 @@ This is exactly like `List.map` for the underlying list.
     mapA ((==) 3) (fromCons 1 [2..4]) == fromCons False [False, True, False]
 -}
 mapA : (a -> b) -> Pivot a -> Pivot b
-mapA = Map.mapA
+mapA =
+    Map.mapA
 
 
 {-| Like `mapA`, but only the center is affected.
 -}
 mapC : (a -> a) -> Pivot a -> Pivot a
-mapC = Map.mapC
+mapC =
+    Map.mapC
 
 
 {-| Like `mapA`, but only the left is affected.
 -}
 mapL : (a -> a) -> Pivot a -> Pivot a
-mapL = Map.mapL
+mapL =
+    Map.mapL
 
 
 {-| Like `mapA`, but only the right is affected.
 -}
 mapR : (a -> a) -> Pivot a -> Pivot a
-mapR = Map.mapR
+mapR =
+    Map.mapR
 
 
 {-| Like `mapA`, but the center is __not__ affected.
 -}
 mapS : (a -> a) -> Pivot a -> Pivot a
-mapS = Map.mapS
+mapS =
+    Map.mapS
 
 
 {-| Like `mapCLR`, but the functions for the left and right act on the
 lists as a whole, and not on each member separately.
 -}
-mapCLR' : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCLR' = Map.mapCLR'
+mapCLR_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapCLR_ =
+    Map.mapCLR_
 
 
-{-| See `mapCLR'`.
+{-| See `mapCLR_`.
 -}
-mapCRL' : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCRL' = Map.mapCRL'
+mapCRL_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapCRL_ =
+    Map.mapCRL_
 
 
-{-| See `mapCLR'`.
+{-| See `mapCLR_`.
 -}
-mapCS' : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCS' = Map.mapCS'
+mapCS_ : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapCS_ =
+    Map.mapCS_
 
 
-{-| See `mapCLR'`.
+{-| See `mapCLR_`.
 -}
-mapL' : (List a -> List a) -> Pivot a -> Pivot a
-mapL' = Map.mapL'
+mapL_ : (List a -> List a) -> Pivot a -> Pivot a
+mapL_ =
+    Map.mapL_
 
 
-{-| See `mapCLR'`.
+{-| See `mapCLR_`.
 -}
-mapR' : (List a -> List a) -> Pivot a -> Pivot a
-mapR' = Map.mapR'
+mapR_ : (List a -> List a) -> Pivot a -> Pivot a
+mapR_ =
+    Map.mapR_
 
 
-{-| See `mapCLR'`.
+{-| See `mapCLR_`.
 -}
-mapS' : (List a -> List a) -> Pivot a -> Pivot a
-mapS' = Map.mapS'
+mapS_ : (List a -> List a) -> Pivot a -> Pivot a
+mapS_ =
+    Map.mapS_
 
 
 {-| Adds indices to the values.
 Based internally on `List.indexedMap`.
 -}
-zip : Pivot a -> Pivot (Int, a)
-zip = Map.zip
+zip : Pivot a -> Pivot ( Int, a )
+zip =
+    Map.zip
 
 
 {-| Apply functions in a pivot on values in another Pivot.
@@ -505,31 +556,35 @@ But how does a list of functions get applied on a list of values?
 Well, each function maps over the complete list of values,
 and then all the lists created from these applications are concatinated.
 
-    mapCLR onC onL onR == (pure onC |> setL [onL] |> setR [onR] |> apply)
+    mapCLR onC onL onR == (singleton onC |> setL [ onL ] |> setR [ onR ] |> apply)
 -}
 apply : Pivot (a -> b) -> Pivot a -> Pivot b
-apply = Map.apply
+apply =
+    Map.apply
 
 
 {-| Reverse a pivot, like a list. You could also think of it as mirroring
 left and right.
 -}
 reverse : Pivot a -> Pivot a
-reverse = Utilities.reverse
+reverse =
+    Utilities.reverse
 
 
 {-| Reverse a function's notion of left and right.
 Used in many of this library's functions under the hood
 -}
 mirror : (Pivot a -> Pivot b) -> Pivot a -> Pivot b
-mirror = Utilities.mirror
+mirror =
+    Utilities.mirror
 
 
 {-| Reverse a possibly-failing-function's notion of left and right.
 Used in many of this library's functions under the hood
 -}
 mirrorM : (Pivot a -> Maybe (Pivot b)) -> Pivot a -> Maybe (Pivot b)
-mirrorM = Utilities.mirrorM
+mirrorM =
+    Utilities.mirrorM
 
 
 {-| Takes a pivot full of possible values, and realizes it only if all
@@ -542,7 +597,8 @@ For example, you could define
     mapAM f = mapA f >> assert
 -}
 assert : Pivot (Maybe a) -> Maybe (Pivot a)
-assert = Utilities.assert
+assert =
+    Utilities.assert
 
 
 {-| Replace a possibly-failing-function with a possibly-does-nothing-function.
@@ -568,4 +624,5 @@ It might be useful to define infix operators as such.
     goR <! pvt == withRollback goR pvt
 -}
 withRollback : (a -> Maybe a) -> a -> a
-withRollback = Utilities.withRollback
+withRollback =
+    Utilities.withRollback
