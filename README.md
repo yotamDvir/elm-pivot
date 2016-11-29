@@ -74,7 +74,7 @@ update msg model =
       -- Attempt to add to an existing collection.
       |> Maybe.map (P.addGoR item)
       -- Start from scratch otherwise.
-      |> Maybe.withDefault (P.pure item)
+      |> Maybe.withDefault (P.singleton item)
       -- Wrap back into a `Maybe`.
       |> Just
     MoveItemUp ->
@@ -165,7 +165,7 @@ type alias Model = Pivot Counters
 init : Model
 init =
   initRec
-  |> P.pure
+  |> P.singleton
 
 type Msg
   = New RecMsg
@@ -212,7 +212,7 @@ type alias Model =
 
 init : Model
 init =
-  { counter1 = P.pure 0
+  { counter1 = P.singleton 0
   , counter2 = 0
   }
 

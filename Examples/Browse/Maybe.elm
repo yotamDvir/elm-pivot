@@ -61,7 +61,7 @@ update msg model =
                 |> Maybe.map (P.addGoR item)
                 -- Attempt to add to an existing collection.
                 |>
-                    Maybe.withDefault (P.pure item)
+                    Maybe.withDefault (P.singleton item)
                 -- Start from scratch otherwise.
                 |>
                     Just

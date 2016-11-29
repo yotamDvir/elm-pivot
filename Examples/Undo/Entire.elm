@@ -53,7 +53,7 @@ type alias Model =
 init : Model
 init =
     initRec
-        |> P.pure
+        |> P.singleton
 
 
 type Msg
