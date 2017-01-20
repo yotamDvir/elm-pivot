@@ -62,13 +62,13 @@ update msg model =
     Remove ->
       -- Attempt to remove and go backwards.
       -- Will fail if there is no backwards to go to.
-      case model `Maybe.andThen` P.removeGoL of
+      case model |> Maybe.andThen P.removeGoL of
         Just collection ->
           Just collection
         Nothing ->
           -- Attempt to remove and go forward otherwise.
           -- Upon failure, there is nowhere to go, so Nothing is OK.
-          model `Maybe.andThen` P.removeGoR
+          model |> Maybe.andThen P.removeGoR
     Add item ->
       model
       -- Attempt to add to an existing collection.
