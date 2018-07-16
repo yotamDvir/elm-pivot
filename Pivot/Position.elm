@@ -37,6 +37,19 @@ goTo dest =
     goToStart >> goBy dest
 
 
+goWhere : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
+goWhere isIt =
+    let
+        go_ : Pivot a -> Maybe (Pivot a)
+        go_ pvt =
+            if isIt (getC pvt) then
+               Just pvt
+            else
+                goR pvt |> Maybe.andThen go_
+    in
+        goToStart >> go_
+
+
 goToStart : Pivot a -> Pivot a
 goToStart pvt =
     case goL pvt of
@@ -49,8 +62,7 @@ goToStart pvt =
 
 goToEnd : Pivot a -> Pivot a
 goToEnd =
-    goToStart
-        |> mirror
+    goToStart |> mirror
 
 
 lengthL : Pivot a -> Int

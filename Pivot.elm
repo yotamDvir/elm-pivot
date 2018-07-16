@@ -39,7 +39,7 @@ you'd get the same thing you would by applying `getA` beforehand.
 @docs lengthL, lengthR, lengthA
 
 ## Momentum
-@docs goR, goL, goBy, goTo, goToStart, goToEnd
+@docs goR, goL, goBy, goTo, goWhere, goToStart, goToEnd
 
 ## Find
 @docs firstWith, lastWith, findR, findL, findCR, findCL
@@ -284,6 +284,15 @@ _Fails if and only if the position given doesn't exist._
 goTo : Int -> Pivot a -> Maybe (Pivot a)
 goTo =
     Position.goTo
+    
+    
+{-| Go to a specific position with a matching function
+
+_Fails the matching function fails._
+-}
+goWhere : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
+goWhere =
+    Position.goWhere
 
 
 {-| Go to starting position.
