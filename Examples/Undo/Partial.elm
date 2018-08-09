@@ -15,7 +15,7 @@ type alias Model =
 
 init : Model
 init =
-    { counter1 = P.pure 0
+    { counter1 = P.singleton 0
     , counter2 = 0
     }
 
