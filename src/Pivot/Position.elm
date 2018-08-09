@@ -8,18 +8,16 @@ import Pivot.Utilities exposing (..)
 goR : Pivot a -> Maybe (Pivot a)
 goR (Pivot cx ( lt, rt )) =
     case rt of
-        hd :: tl ->
-            Pivot hd ( cx :: lt, tl )
-                |> Just
-
         [] ->
             Nothing
+
+        hd :: tl ->
+            Just (Pivot hd ( cx :: lt, tl ))
 
 
 goL : Pivot a -> Maybe (Pivot a)
 goL =
-    goR
-        |> mirrorM
+    goR |> mirrorM
 
 
 goBy : Int -> Pivot a -> Maybe (Pivot a)
@@ -42,17 +40,16 @@ goTo dest =
 goToStart : Pivot a -> Pivot a
 goToStart pvt =
     case goL pvt of
-        Just pvt_ ->
-            goToStart pvt_
-
         Nothing ->
             pvt
+
+        Just pvt_ ->
+            goToStart pvt_
 
 
 goToEnd : Pivot a -> Pivot a
 goToEnd =
-    goToStart
-        |> mirror
+    goToStart |> mirror
 
 
 lengthL : Pivot a -> Int

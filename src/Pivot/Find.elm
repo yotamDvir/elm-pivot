@@ -18,7 +18,7 @@ lastWith pred =
 
 findCR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findCR pred pvt =
-    if getC pvt |> pred then
+    if pred (getC pvt) then
         Just pvt
 
     else

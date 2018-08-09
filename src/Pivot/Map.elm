@@ -38,8 +38,7 @@ mapL =
 
 mapR : (a -> a) -> Pivot a -> Pivot a
 mapR f =
-    mapL f
-        |> mirror
+    mapL f |> mirror
 
 
 mapS : (a -> a) -> Pivot a -> Pivot a
@@ -53,8 +52,8 @@ mapCLR_ onC_ onL_ onR_ pvt =
 
 
 mapCRL_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCRL_ onC_ =
-    \b a -> mapCLR_ onC_ a b
+mapCRL_ onC_ f g =
+    mapCLR_ onC_ g f
 
 
 mapCS_ : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b

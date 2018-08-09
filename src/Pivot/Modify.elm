@@ -19,57 +19,57 @@ setL l_ (Pivot c ( l, r )) =
 
 setR : List a -> Pivot a -> Pivot a
 setR r_ =
-    setL r_
-        |> mirror
+    setL r_ |> mirror
 
 
 switchL : Pivot a -> Maybe (Pivot a)
 switchL pvt =
-    removeGoL pvt
-        |> Maybe.map (pvt |> getC |> addGoL)
+    removeGoL pvt |> Maybe.map (getC pvt |> appendGoL)
 
 
 switchR : Pivot a -> Maybe (Pivot a)
 switchR =
-    switchL
-        |> mirrorM
+    switchL |> mirrorM
 
 
 removeGoL : Pivot a -> Maybe (Pivot a)
 removeGoL (Pivot c ( l, r )) =
     case l of
-        hd :: tl ->
-            Pivot hd ( tl, r )
-                |> Just
-
         [] ->
             Nothing
+
+        hd :: tl ->
+            Just (Pivot hd ( tl, r ))
 
 
 removeGoR : Pivot a -> Maybe (Pivot a)
 removeGoR =
-    removeGoL
-        |> mirrorM
+    removeGoL |> mirrorM
 
 
-addL : a -> Pivot a -> Pivot a
-addL val (Pivot c ( l, r )) =
+appendL : a -> Pivot a -> Pivot a
+appendL val (Pivot c ( l, r )) =
     Pivot c ( val :: l, r )
 
 
-addR : a -> Pivot a -> Pivot a
-addR val =
-    addL val |> mirror
+appendR : a -> Pivot a -> Pivot a
+appendR val =
+    appendL val |> mirror
 
 
-addGoL : a -> Pivot a -> Pivot a
-addGoL val (Pivot c ( l, r )) =
+appendGoL : a -> Pivot a -> Pivot a
+appendGoL val (Pivot c ( l, r )) =
     Pivot val ( l, c :: r )
 
 
-addGoR : a -> Pivot a -> Pivot a
-addGoR val =
-    addGoL val |> mirror
+appendGoR : a -> Pivot a -> Pivot a
+appendGoR val =
+    appendGoL val |> mirror
+
+
+appendList : List a -> Pivot a -> Pivot a
+appendList xs =
+    mapR_ (\rs -> List.foldl (::) rs xs)
 
 
 sort : Pivot comparable -> Pivot comparable
@@ -92,10 +92,3 @@ sortWith compare (Pivot c ( l, r )) =
         |> List.sortWith compare
         |> List.foldr folder ( [], [] )
         |> Pivot c
-
-
-{-| Appends a list to the end of the Right side of the Pivot
--}
-appendList : List a -> Pivot a -> Pivot a
-appendList xs =
-    mapR_ (\rs -> List.foldl (::) rs xs)

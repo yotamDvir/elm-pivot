@@ -1,10 +1,11 @@
 module Pivot
     exposing
         ( Pivot
-        , addGoL
-        , addGoR
-        , addL
-        , addR
+        , appendGoL
+        , appendGoR
+        , appendL
+        , appendList
+        , appendR
         , apply
         , assert
         , findCL
@@ -134,7 +135,7 @@ Now we start seeing functions that can actually change the underlying list.
 
 ## Add
 
-@docs addL, addR, addGoL, addGoR
+@docs appendL, appendR, appendGoL, appendGoR, appendList
 
 
 ## Remove
@@ -513,16 +514,16 @@ removeGoR =
 
 {-| Add a member to the left of the center
 -}
-addL : a -> Pivot a -> Pivot a
-addL =
-    Modify.addL
+appendL : a -> Pivot a -> Pivot a
+appendL =
+    Modify.appendL
 
 
 {-| Add a member to the right of the center
 -}
-addR : a -> Pivot a -> Pivot a
-addR =
-    Modify.addR
+appendR : a -> Pivot a -> Pivot a
+appendR =
+    Modify.appendR
 
 
 {-| Add a member to the left of the center and immediately move left.
@@ -532,16 +533,23 @@ We know that `addL >> goL` cannot really fail, but it still results in a
     addGoL >> Just == addL >> goL
 
 -}
-addGoL : a -> Pivot a -> Pivot a
-addGoL =
-    Modify.addGoL
+appendGoL : a -> Pivot a -> Pivot a
+appendGoL =
+    Modify.appendGoL
 
 
 {-| Add a member to the right of the center and immediately move right.
 -}
-addGoR : a -> Pivot a -> Pivot a
-addGoR =
-    Modify.addGoR
+appendGoR : a -> Pivot a -> Pivot a
+appendGoR =
+    Modify.appendGoR
+
+
+{-| Append a list to the right.
+-}
+appendList : List a -> Pivot a
+appendList =
+    Modify.appendList
 
 
 {-| Sort a pivot while keeping the center as center.
@@ -745,17 +753,7 @@ Use it, don't abuse it. That is, only use it when it makes sense to ignore
 a failure, or when you are **certain** a possibly-failing-function cannot
 really fail. For example,
 
-    addGoR == addR >> withRollback goR
-
-It might be useful to define infix operators as such.
-
-    (!>) = flip withRollback
-    infixl 0 !>
-
-    (<!) = withRollback
-    infixr 0 <!
-
-    goR <! pvt == withRollback goR pvt
+    appendGoR == appendR >> withRollback goR
 
 -}
 withRollback : (a -> Maybe a) -> a -> a
