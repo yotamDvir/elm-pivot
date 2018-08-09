@@ -1,9 +1,9 @@
 module Pivot.Map exposing (..)
 
-import Pivot.Types exposing (..)
-import Pivot.Utilities exposing (..)
 import Pivot.Get exposing (..)
 import Pivot.Position exposing (..)
+import Pivot.Types exposing (..)
+import Pivot.Utilities exposing (..)
 
 
 mapCLR : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
@@ -12,8 +12,8 @@ mapCLR onC onL onR =
 
 
 mapCRL : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
-mapCRL onC =
-    flip (mapCLR onC)
+mapCRL onC f g =
+    mapCLR onC g f
 
 
 mapCS : (a -> b) -> (a -> b) -> Pivot a -> Pivot b
@@ -27,8 +27,8 @@ mapA onA =
 
 
 mapC : (a -> a) -> Pivot a -> Pivot a
-mapC =
-    flip mapCS identity
+mapC a =
+    mapCS a identity
 
 
 mapL : (a -> a) -> Pivot a -> Pivot a
@@ -54,7 +54,7 @@ mapCLR_ onC_ onL_ onR_ pvt =
 
 mapCRL_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
 mapCRL_ onC_ =
-    flip (mapCLR_ onC_)
+    \b a -> mapCLR_ onC_ a b
 
 
 mapCS_ : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
@@ -69,8 +69,7 @@ mapL_ =
 
 mapR_ : (List a -> List a) -> Pivot a -> Pivot a
 mapR_ f =
-    mapL_ f
-        |> mirror
+    mapL_ f |> mirror
 
 
 mapS_ : (List a -> List a) -> Pivot a -> Pivot a
@@ -84,22 +83,22 @@ zip pvt =
         n =
             lengthL pvt
 
-        onC =
-            (,) n
+        onC b =
+            ( n, b )
 
         onL =
-            List.indexedMap (,)
+            List.indexedMap (\a b -> ( a, b ))
 
         onR =
-            List.indexedMap ((+) (n + 1) >> (,))
+            List.indexedMap ((+) (n + 1) >> (\a b -> ( a, b )))
     in
-        mapCLR_ onC onL onR pvt
+    mapCLR_ onC onL onR pvt
 
 
 apply : Pivot (a -> b) -> Pivot a -> Pivot b
 apply (Pivot cf ( lf, rf )) (Pivot c ( l, r )) =
     let
         apList fs xs =
-            List.concatMap (flip List.map xs) fs
+            List.concatMap (\a -> List.map a xs) fs
     in
-        Pivot (cf c) ( apList lf l, apList rf r )
+    Pivot (cf c) ( apList lf l, apList rf r )

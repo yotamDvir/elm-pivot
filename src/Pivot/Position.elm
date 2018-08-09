@@ -1,8 +1,8 @@
 module Pivot.Position exposing (..)
 
+import Pivot.Get exposing (..)
 import Pivot.Types exposing (..)
 import Pivot.Utilities exposing (..)
-import Pivot.Get exposing (..)
 
 
 goR : Pivot a -> Maybe (Pivot a)
@@ -26,8 +26,10 @@ goBy : Int -> Pivot a -> Maybe (Pivot a)
 goBy steps pvt =
     if steps == 0 then
         Just pvt
+
     else if steps > 0 then
         goR pvt |> Maybe.andThen (goBy (steps - 1))
+
     else
         goL pvt |> Maybe.andThen (goBy (steps + 1))
 

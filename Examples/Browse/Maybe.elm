@@ -60,11 +60,9 @@ update msg model =
             model
                 |> Maybe.map (P.addGoR item)
                 -- Attempt to add to an existing collection.
-                |>
-                    Maybe.withDefault (P.pure item)
+                |> Maybe.withDefault (P.pure item)
                 -- Start from scratch otherwise.
-                |>
-                    Just
+                |> Just
 
         -- Make the collection a `Maybe` again.
         MoveItemUp ->

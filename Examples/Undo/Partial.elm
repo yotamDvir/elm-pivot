@@ -56,8 +56,8 @@ counter1Update counter1Msg counter1 =
                 next =
                     P.getC counter1 + 1
             in
-                counter1
-                    |> P.addGoR next
+            counter1
+                |> P.addGoR next
 
         Undo ->
             counter1

@@ -1,9 +1,10 @@
 module Pivot.Modify exposing (..)
 
-import Pivot.Types exposing (..)
-import Pivot.Utilities exposing (..)
 import Pivot.Create exposing (..)
 import Pivot.Get exposing (..)
+import Pivot.Map exposing (..)
+import Pivot.Types exposing (..)
+import Pivot.Utilities exposing (..)
 
 
 setC : a -> Pivot a -> Pivot a
@@ -58,8 +59,7 @@ addL val (Pivot c ( l, r )) =
 
 addR : a -> Pivot a -> Pivot a
 addR val =
-    addL val
-        |> mirror
+    addL val |> mirror
 
 
 addGoL : a -> Pivot a -> Pivot a
@@ -69,8 +69,7 @@ addGoL val (Pivot c ( l, r )) =
 
 addGoR : a -> Pivot a -> Pivot a
 addGoR val =
-    addGoL val
-        |> mirror
+    addGoL val |> mirror
 
 
 sort : Pivot comparable -> Pivot comparable
@@ -89,8 +88,14 @@ sortWith compare (Pivot c ( l, r )) =
                 _ ->
                     ( l_ ++ [ item ], r_ )
     in
-        l
-            ++ r
-            |> List.sortWith compare
-            |> List.foldr folder ( [], [] )
-            |> Pivot c
+    (l ++ r)
+        |> List.sortWith compare
+        |> List.foldr folder ( [], [] )
+        |> Pivot c
+
+
+{-| Appends a list to the end of the Right side of the Pivot
+-}
+appendList : List a -> Pivot a -> Pivot a
+appendList xs =
+    mapR_ (\rs -> List.foldl (::) rs xs)

@@ -1,9 +1,9 @@
 module Pivot.Find exposing (..)
 
-import Pivot.Types exposing (..)
-import Pivot.Utilities exposing (..)
 import Pivot.Get exposing (..)
 import Pivot.Position exposing (..)
+import Pivot.Types exposing (..)
+import Pivot.Utilities exposing (..)
 
 
 firstWith : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
@@ -13,14 +13,14 @@ firstWith pred =
 
 lastWith : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 lastWith pred =
-    firstWith pred
-        |> mirrorM
+    firstWith pred |> mirrorM
 
 
 findCR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findCR pred pvt =
-    if pvt |> getC |> pred then
+    if getC pvt |> pred then
         Just pvt
+
     else
         goR pvt |> Maybe.andThen (findCR pred)
 
@@ -32,11 +32,9 @@ findR pred pvt =
 
 findCL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findCL pred =
-    findCR pred
-        |> mirrorM
+    findCR pred |> mirrorM
 
 
 findL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findL pred =
-    findR pred
-        |> mirrorM
+    findR pred |> mirrorM
