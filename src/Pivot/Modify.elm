@@ -1,4 +1,21 @@
-module Pivot.Modify exposing (..)
+module Pivot.Modify
+    exposing
+        ( appendGoL
+        , appendGoR
+        , appendL
+        , appendListL
+        , appendListR
+        , appendR
+        , removeGoL
+        , removeGoR
+        , setC
+        , setL
+        , setR
+        , sort
+        , sortWith
+        , switchL
+        , switchR
+        )
 
 import Pivot.Create exposing (..)
 import Pivot.Get exposing (..)
@@ -67,8 +84,13 @@ appendGoR val =
     appendGoL val |> mirror
 
 
-appendList : List a -> Pivot a -> Pivot a
-appendList xs =
+appendListL : List a -> Pivot a -> Pivot a
+appendListL xs =
+    mapL_ ((++) xs)
+
+
+appendListR : List a -> Pivot a -> Pivot a
+appendListR xs =
     mapR_ (\rs -> List.foldl (::) rs xs)
 
 

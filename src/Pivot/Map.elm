@@ -1,4 +1,22 @@
-module Pivot.Map exposing (..)
+module Pivot.Map
+    exposing
+        ( apply
+        , mapA
+        , mapC
+        , mapCLR
+        , mapCLR_
+        , mapCRL
+        , mapCRL_
+        , mapCS
+        , mapCS_
+        , mapL
+        , mapL_
+        , mapR
+        , mapR_
+        , mapS
+        , mapS_
+        , zip
+        )
 
 import Pivot.Get exposing (..)
 import Pivot.Position exposing (..)
@@ -27,8 +45,8 @@ mapA onA =
 
 
 mapC : (a -> a) -> Pivot a -> Pivot a
-mapC a =
-    mapCS a identity
+mapC f =
+    mapCS f identity
 
 
 mapL : (a -> a) -> Pivot a -> Pivot a
@@ -47,8 +65,8 @@ mapS =
 
 
 mapCLR_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCLR_ onC_ onL_ onR_ pvt =
-    Pivot (pvt |> getC |> onC_) ( pvt |> getL |> onL_ |> List.reverse, pvt |> getR |> onR_ )
+mapCLR_ onC_ onL_ onR_ (Pivot c ( l, r )) =
+    Pivot (onC_ c) ( onL_ l |> List.reverse, r |> onR_ )
 
 
 mapCRL_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b

@@ -4,7 +4,8 @@ module Pivot
         , appendGoL
         , appendGoR
         , appendL
-        , appendList
+        , appendListL
+        , appendListR
         , appendR
         , apply
         , assert
@@ -133,9 +134,9 @@ Now we start seeing functions that can actually change the underlying list.
 @docs setC, setL, setR
 
 
-## Add
+## Append
 
-@docs appendL, appendR, appendGoL, appendGoR, appendList
+@docs appendL, appendR, appendGoL, appendGoR, appendListL, appendListR
 
 
 ## Remove
@@ -545,11 +546,18 @@ appendGoR =
     Modify.appendGoR
 
 
-{-| Append a list to the right.
+{-| Append a list to the front of the left.
 -}
-appendList : List a -> Pivot a
-appendList =
-    Modify.appendList
+appendListL : List a -> Pivot a -> Pivot a
+appendListL =
+    Modify.appendListL
+
+
+{-| Append a list to the back of the right.
+-}
+appendListR : List a -> Pivot a -> Pivot a
+appendListR =
+    Modify.appendListR
 
 
 {-| Sort a pivot while keeping the center as center.

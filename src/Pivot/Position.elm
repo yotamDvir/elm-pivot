@@ -1,4 +1,15 @@
-module Pivot.Position exposing (..)
+module Pivot.Position
+    exposing
+        ( goBy
+        , goL
+        , goR
+        , goTo
+        , goToEnd
+        , goToStart
+        , lengthA
+        , lengthL
+        , lengthR
+        )
 
 import Pivot.Get exposing (..)
 import Pivot.Types exposing (..)

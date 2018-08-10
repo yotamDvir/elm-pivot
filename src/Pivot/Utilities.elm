@@ -1,4 +1,11 @@
-module Pivot.Utilities exposing (..)
+module Pivot.Utilities
+    exposing
+        ( assert
+        , mirror
+        , mirrorM
+        , reverse
+        , withRollback
+        )
 
 import Pivot.Types exposing (..)
 
