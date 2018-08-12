@@ -58,8 +58,8 @@ update msg model =
         -- Attempt to go forward otherwise.
         Add item ->
             model
-                |> Maybe.map (P.addGoR item)
-                -- Attempt to add to an existing collection.
+                |> Maybe.map (P.appendGoR item)
+                -- Attempt to append to an existing collection.
                 |> Maybe.withDefault (P.singleton item)
                 -- Start from scratch otherwise.
                 |> Just

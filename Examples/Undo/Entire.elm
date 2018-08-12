@@ -83,4 +83,4 @@ update msg model =
             in
             -- Adding the next state.
             model
-                |> P.addGoR next
+                |> P.appendGoR next
