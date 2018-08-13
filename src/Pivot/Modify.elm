@@ -86,7 +86,7 @@ appendGoR val =
 
 appendListL : List a -> Pivot a -> Pivot a
 appendListL xs =
-    mapL_ ((++) xs)
+    mapL_ (List.append xs)
 
 
 appendListR : List a -> Pivot a -> Pivot a
