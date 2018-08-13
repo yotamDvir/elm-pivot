@@ -1,4 +1,67 @@
-module Pivot exposing (..)
+module Pivot
+    exposing
+        ( Pivot
+        , appendGoL
+        , appendGoR
+        , appendL
+        , appendListL
+        , appendListR
+        , appendR
+        , apply
+        , assert
+        , findCL
+        , findCR
+        , findL
+        , findR
+        , firstWith
+        , fromCons
+        , fromList
+        , getA
+        , getC
+        , getL
+        , getR
+        , goBy
+        , goL
+        , goR
+        , goTo
+        , goToEnd
+        , goToStart
+        , hasL
+        , hasR
+        , lastWith
+        , lengthA
+        , lengthL
+        , lengthR
+        , mapA
+        , mapC
+        , mapCLR
+        , mapCLR_
+        , mapCRL
+        , mapCRL_
+        , mapCS
+        , mapCS_
+        , mapL
+        , mapL_
+        , mapR
+        , mapR_
+        , mapS
+        , mapS_
+        , mirror
+        , mirrorM
+        , removeGoL
+        , removeGoR
+        , reverse
+        , setC
+        , setL
+        , setR
+        , singleton
+        , sort
+        , sortWith
+        , switchL
+        , switchR
+        , withRollback
+        , zip
+        )
 
 {-| A pivot is a list upgraded with a center and sides. However, a pivot
 can never be empty, so it is better to think of it an upgraded cons list.
@@ -6,99 +69,144 @@ can never be empty, so it is better to think of it an upgraded cons list.
 In this library, we suffix functions with letters to denote their context,
 as follows.
 
-* The __C__enter
-* Both __S__ides
-* The __L__eft side
-* The __R__ight side
-* __A__ll the members
+  - The **C**enter
+  - Both **S**ides
+  - The **L**eft side
+  - The **R**ight side
+  - **A**ll the members
 
 This way you can guess a function's name easily.
 See the different `map*` functions.
 
 For example, `getL` gets the left side of a pivot.
 
+
 # Type
+
 @docs Pivot
 
+
 # To & Fro
+
 So you want to use a pivot? Better know how to create one, and get stuff back!
 
+
 ## Create
+
 @docs fromList, fromCons, singleton
 
+
 ## Get
+
 @docs getC, getL, getR, getA, hasL, hasR
 
+
 # Movement
+
 Handle the position of the center.
 These functions do not mutate the underlying list.
 That is, if you apply functions from here and then apply `getA`,
 you'd get the same thing you would by applying `getA` beforehand.
 
+
 ## Position
+
 @docs lengthL, lengthR, lengthA
 
+
 ## Momentum
+
 @docs goR, goL, goBy, goTo, goToStart, goToEnd
 
+
 ## Find
+
 @docs firstWith, lastWith, findR, findL, findCR, findCL
 
+
 # Modify
+
 Now we start seeing functions that can actually change the underlying list.
 
+
 ## Set
+
 @docs setC, setL, setR
 
-## Add
-@docs addL, addR, addGoL, addGoR
+
+## Append
+
+@docs appendL, appendR, appendGoL, appendGoR, appendListL, appendListR
+
 
 ## Remove
+
 Removing is not guaranteed to work,
 for the simple reason that a pivot cannot be empty.
+
 @docs removeGoL, removeGoR
 
+
 ## Switch
+
 Switch places with other members.
+
 @docs switchL, switchR
 
+
 ## Sort
+
 @docs sort, sortWith
 
+
 # Maps
+
 Lists can be mapped over, and so can pivots.
 However, since a pivot is made up of three distinct objects at any time,
 it makes sense that you may want to apply different transformations to
 the different objects.
 
+
 ## Maps
+
 @docs mapCLR, mapCRL, mapCS, mapA
 
+
 ## Constraint Maps
+
 If you want to map only over some of the pivot,
 then you must retain the type.
+
 @docs mapC, mapS, mapL, mapR
 
+
 ## As a whole
+
 Some `List a -> List a` functions cannot be made from `a -> a` functions.
 This is why these maps may be of importance.
 Just add `_` to a `map*` function to use functions on lists instead of values.
+
 @docs mapCLR_, mapCRL_, mapCS_, mapS_, mapL_, mapR_
 
+
 ## Special
+
 @docs zip, apply
 
+
 # Utilities
+
 @docs reverse, mirror, mirrorM, assert, withRollback
+
 -}
 
-import Pivot.Types
 import Pivot.Create as Create
-import Pivot.Get as Get
 import Pivot.Find as Find
-import Pivot.Position as Position
-import Pivot.Modify as Modify
+import Pivot.Get as Get
 import Pivot.Map as Map
+import Pivot.Modify as Modify
+import Pivot.Position as Position
+import Pivot.Types
 import Pivot.Utilities as Utilities
 
 
@@ -113,6 +221,7 @@ type alias Pivot a =
 _Fails if and only if the list given is empty._
 
     fromList [] == Nothing
+
 -}
 fromList : List a -> Maybe (Pivot a)
 fromList =
@@ -125,6 +234,7 @@ fromList =
     getL (fromCons "well" ["hello", "world"]) == []
     getR (fromCons "well" ["hello", "world"]) == ["hello", "world"]
     Just (fromCons 1 [2..4]) == fromList [1..4]
+
 -}
 fromCons : a -> List a -> Pivot a
 fromCons =
@@ -134,6 +244,7 @@ fromCons =
 {-| Like `fromCons`, but without the list. That is, we specify only the center.
 
     singleton == flip fromCons []
+
 -}
 singleton : a -> Pivot a
 singleton =
@@ -143,6 +254,7 @@ singleton =
 {-| Get the center member.
 
     singleton >> getC == identity
+
 -}
 getC : Pivot a -> a
 getC =
@@ -187,6 +299,7 @@ hasR =
 {-| Find the first member of a pivot satisfying some predicate.
 
 _Fails if and only if there are no such members._
+
 -}
 firstWith : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 firstWith =
@@ -196,6 +309,7 @@ firstWith =
 {-| Find the last member of a pivot satisfying some predicate.
 
 _Fails if and only if there are no such members._
+
 -}
 lastWith : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 lastWith =
@@ -207,6 +321,7 @@ lastWith =
 _Fails if and only if there are no such members._
 
     findR ((==) 3) (fromCons 1 [2..4]) == (singleton 3 |> setL [1, 2] |> setR [4])
+
 -}
 findR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findR =
@@ -216,6 +331,7 @@ findR =
 {-| Find the first member to the center's left satisfying some predicate.
 
 _Fails if and only if there are no such members._
+
 -}
 findL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findL =
@@ -227,6 +343,7 @@ findL =
 _Fails if and only if there are no such members._
 
     firstWith == \pred -> goToStart >> findCR pred
+
 -}
 findCR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findCR =
@@ -236,6 +353,7 @@ findCR =
 {-| Like `findL`, but checks the center first as well.
 
 _Fails if and only if there are no such members._
+
 -}
 findCL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findCL =
@@ -247,9 +365,10 @@ findCL =
 _Fails if and only if the right side is empty._
 
 Tip: You can avoid the failure using `withRollback`,
-and instead have a possible no-op. See __Utilities__.
+and instead have a possible no-op. See **Utilities**.
 
     fromCons 1 [2..4] |> goR /= Nothing
+
 -}
 goR : Pivot a -> Maybe (Pivot a)
 goR =
@@ -262,6 +381,7 @@ _Fails if and only if the left side is empty._
 
     goL (fromCons 1 [2..4]) == Nothing
     withRollback goL (fromCons 1 [2..4]) == fromCons 1 [2..4]
+
 -}
 goL : Pivot a -> Maybe (Pivot a)
 goL =
@@ -271,6 +391,7 @@ goL =
 {-| Move right by some number of steps. Negative number moves left instead.
 
 _Fails if and only if the movement goes out of bounds._
+
 -}
 goBy : Int -> Pivot a -> Maybe (Pivot a)
 goBy =
@@ -280,6 +401,7 @@ goBy =
 {-| Go to a specific position from the left. Starts with 0.
 
 _Fails if and only if the position given doesn't exist._
+
 -}
 goTo : Int -> Pivot a -> Maybe (Pivot a)
 goTo =
@@ -289,6 +411,7 @@ goTo =
 {-| Go to starting position.
 
     goToStart >> lengthL == 0
+
 -}
 goToStart : Pivot a -> Pivot a
 goToStart =
@@ -298,6 +421,7 @@ goToStart =
 {-| Go to starting position.
 
     goToEnd >> lengthR == 0
+
 -}
 goToEnd : Pivot a -> Pivot a
 goToEnd =
@@ -321,6 +445,7 @@ lengthR =
 {-| Length of the pivot.
 
     lengthA == \p -> lengthL p + 1 + lengthR p
+
 -}
 lengthA : Pivot a -> Int
 lengthA =
@@ -351,6 +476,7 @@ setR =
 {-| Switch places with member nearest to the left
 
 _Fails if and only if left side is empty_
+
 -}
 switchL : Pivot a -> Maybe (Pivot a)
 switchL =
@@ -360,6 +486,7 @@ switchL =
 {-| Switch places with member nearest to the right
 
 _Fails if and only if right side is empty_
+
 -}
 switchR : Pivot a -> Maybe (Pivot a)
 switchR =
@@ -369,6 +496,7 @@ switchR =
 {-| Replace center with member nearest to the left.
 
 _Fails if and only if left side is empty._
+
 -}
 removeGoL : Pivot a -> Maybe (Pivot a)
 removeGoL =
@@ -378,6 +506,7 @@ removeGoL =
 {-| Replace center with member nearest to the right.
 
 _Fails if and only if right side is empty._
+
 -}
 removeGoR : Pivot a -> Maybe (Pivot a)
 removeGoR =
@@ -386,16 +515,16 @@ removeGoR =
 
 {-| Add a member to the left of the center
 -}
-addL : a -> Pivot a -> Pivot a
-addL =
-    Modify.addL
+appendL : a -> Pivot a -> Pivot a
+appendL =
+    Modify.appendL
 
 
 {-| Add a member to the right of the center
 -}
-addR : a -> Pivot a -> Pivot a
-addR =
-    Modify.addR
+appendR : a -> Pivot a -> Pivot a
+appendR =
+    Modify.appendR
 
 
 {-| Add a member to the left of the center and immediately move left.
@@ -403,17 +532,32 @@ We know that `addL >> goL` cannot really fail, but it still results in a
 `Maybe` type. This avoids this issue.
 
     addGoL >> Just == addL >> goL
+
 -}
-addGoL : a -> Pivot a -> Pivot a
-addGoL =
-    Modify.addGoL
+appendGoL : a -> Pivot a -> Pivot a
+appendGoL =
+    Modify.appendGoL
 
 
 {-| Add a member to the right of the center and immediately move right.
 -}
-addGoR : a -> Pivot a -> Pivot a
-addGoR =
-    Modify.addGoR
+appendGoR : a -> Pivot a -> Pivot a
+appendGoR =
+    Modify.appendGoR
+
+
+{-| Append a list to the front of the left.
+-}
+appendListL : List a -> Pivot a -> Pivot a
+appendListL =
+    Modify.appendListL
+
+
+{-| Append a list to the back of the right.
+-}
+appendListR : List a -> Pivot a -> Pivot a
+appendListR =
+    Modify.appendListR
 
 
 {-| Sort a pivot while keeping the center as center.
@@ -422,6 +566,7 @@ It does not simply sort each side separately!
 
     sort >> getA == getA >> List.sort
     getC == sort >> getC
+
 -}
 sort : Pivot comparable -> Pivot comparable
 sort =
@@ -431,6 +576,7 @@ sort =
 {-| Like `sort`, but with a costum comparator.
 
     sort == sortWith compare
+
 -}
 sortWith : (a -> a -> Order) -> Pivot a -> Pivot a
 sortWith =
@@ -464,6 +610,7 @@ mapCS =
 This is exactly like `List.map` for the underlying list.
 
     mapA ((==) 3) (fromCons 1 [2..4]) == fromCons False [False, True, False]
+
 -}
 mapA : (a -> b) -> Pivot a -> Pivot b
 mapA =
@@ -491,7 +638,7 @@ mapR =
     Map.mapR
 
 
-{-| Like `mapA`, but the center is __not__ affected.
+{-| Like `mapA`, but the center is **not** affected.
 -}
 mapS : (a -> a) -> Pivot a -> Pivot a
 mapS =
@@ -557,6 +704,7 @@ Well, each function maps over the complete list of values,
 and then all the lists created from these applications are concatinated.
 
     mapCLR onC onL onR == (singleton onC |> setL [ onL ] |> setR [ onR ] |> apply)
+
 -}
 apply : Pivot (a -> b) -> Pivot a -> Pivot b
 apply =
@@ -594,7 +742,9 @@ This is great for composing with the different map functions.
 For example, you could define
 
     mapAM : (a -> Maybe b) -> Pivot a -> Maybe (Pivot b)
-    mapAM f = mapA f >> assert
+    mapAM f =
+        mapA f >> assert
+
 -}
 assert : Pivot (Maybe a) -> Maybe (Pivot a)
 assert =
@@ -608,21 +758,19 @@ But if you `withRollback goR` a pivot,
 the worst that could happen is that nothing happens.
 
 Use it, don't abuse it. That is, only use it when it makes sense to ignore
-a failure, or when you are __certain__ a possibly-failing-function cannot
+a failure, or when you are **certain** a possibly-failing-function cannot
 really fail. For example,
 
-    addGoR == addR >> withRollback goR
+    appendGoR == appendR >> withRollback goR
 
-It might be useful to define infix operators as such.
-
-    (!>) = flip withRollback
-    infixl 0 !>
-
-    (<!) = withRollback
-    infixr 0 <!
-
-    goR <! pvt == withRollback goR pvt
 -}
 withRollback : (a -> Maybe a) -> a -> a
 withRollback =
     Utilities.withRollback
+
+
+{-| alias for `getA`
+-}
+toList : Pivot a -> List a
+toList =
+    getA

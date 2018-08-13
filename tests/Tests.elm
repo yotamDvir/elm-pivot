@@ -1,13 +1,13 @@
 module Tests exposing (..)
 
 import Debug exposing (log)
-import Test exposing (..)
 import Expect as Ex exposing (Expectation)
 import Fuzz as Fz exposing (Fuzzer)
-import String
-import Pivot.Types as T
 import Pivot exposing (..)
+import Pivot.Types as T
 import Pivot.Utilities exposing (assertList)
+import String
+import Test exposing (..)
 
 
 all : Test
@@ -35,12 +35,13 @@ equalIff : Bool -> a -> a -> Expectation
 equalIff should =
     if should then
         Ex.equal
+
     else
         Ex.notEqual
 
 
 iff =
-    flip equalIff
+    \b a -> equalIff a b
 
 
 
@@ -62,7 +63,7 @@ utilities =
                 toPivot l c r
                     |> mirror (mapL <| always 'A')
                     |> getR
-                    |> Ex.equal (flip List.map r <| always 'A')
+                    |> Ex.equal ((\a -> List.map a r) <| always 'A')
         , fuzz_ Fz.char "mirrorM turns leftM functions into rightM functions" <|
             \l c r ->
                 toPivot l c r
@@ -130,7 +131,7 @@ get =
                     |> Ex.equal r
         , fuzz_ Fz.char "getA == \\p -> getL p ++ [getC p] ++ getR p" <|
             \l c r ->
-                Ex.equal (toPivot l c r |> \p -> getL p ++ [ getC p ] ++ getR p) (toPivot l c r |> getA)
+                Ex.equal (toPivot l c r |> (\p -> getL p ++ [ getC p ] ++ getR p)) (toPivot l c r |> getA)
         , fuzz_ Fz.float "hasL gives False iff no left" <|
             \l c r ->
                 toPivot l c r

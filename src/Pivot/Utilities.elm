@@ -1,4 +1,11 @@
-module Pivot.Utilities exposing (..)
+module Pivot.Utilities
+    exposing
+        ( assert
+        , mirror
+        , mirrorM
+        , reverse
+        , withRollback
+        )
 
 import Pivot.Types exposing (..)
 
@@ -24,14 +31,12 @@ assertList =
         maybeAppend maybeVal maybeList =
             case ( maybeVal, maybeList ) of
                 ( Just val, Just list ) ->
-                    val
-                        :: list
-                        |> Just
+                    Just (val :: list)
 
                 _ ->
                     Nothing
     in
-        Just [] |> List.foldr maybeAppend
+    Just [] |> List.foldr maybeAppend
 
 
 assert : Pivot (Maybe a) -> Maybe (Pivot a)
@@ -46,15 +51,4 @@ assert (Pivot mc ( ml, mr )) =
 
 withRollback : (a -> Maybe a) -> a -> a
 withRollback f x =
-    f x
-        |> Maybe.withDefault x
-
-
-(!>) =
-    flip withRollback
-infixl 0 !>
-
-
-(<!) =
-    withRollback
-infixr 0 <!
+    f x |> Maybe.withDefault x

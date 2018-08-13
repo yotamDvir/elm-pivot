@@ -1,33 +1,44 @@
-module Pivot.Position exposing (..)
+module Pivot.Position
+    exposing
+        ( goBy
+        , goL
+        , goR
+        , goTo
+        , goToEnd
+        , goToStart
+        , lengthA
+        , lengthL
+        , lengthR
+        )
 
+import Pivot.Get exposing (..)
 import Pivot.Types exposing (..)
 import Pivot.Utilities exposing (..)
-import Pivot.Get exposing (..)
 
 
 goR : Pivot a -> Maybe (Pivot a)
 goR (Pivot cx ( lt, rt )) =
     case rt of
-        hd :: tl ->
-            Pivot hd ( cx :: lt, tl )
-                |> Just
-
         [] ->
             Nothing
+
+        hd :: tl ->
+            Just (Pivot hd ( cx :: lt, tl ))
 
 
 goL : Pivot a -> Maybe (Pivot a)
 goL =
-    goR
-        |> mirrorM
+    goR |> mirrorM
 
 
 goBy : Int -> Pivot a -> Maybe (Pivot a)
 goBy steps pvt =
     if steps == 0 then
         Just pvt
+
     else if steps > 0 then
         goR pvt |> Maybe.andThen (goBy (steps - 1))
+
     else
         goL pvt |> Maybe.andThen (goBy (steps + 1))
 
@@ -40,17 +51,16 @@ goTo dest =
 goToStart : Pivot a -> Pivot a
 goToStart pvt =
     case goL pvt of
-        Just pvt_ ->
-            goToStart pvt_
-
         Nothing ->
             pvt
+
+        Just pvt_ ->
+            goToStart pvt_
 
 
 goToEnd : Pivot a -> Pivot a
 goToEnd =
-    goToStart
-        |> mirror
+    goToStart |> mirror
 
 
 lengthL : Pivot a -> Int

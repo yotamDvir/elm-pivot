@@ -1,0 +1,14 @@
+{
+    "type": "application",
+    "source-directories": [
+        ".",
+        "../"
+    ],
+    "elm-version": "0.19.0",
+    "dependencies": {
+    },
+    "test-dependencies": {},
+    "do-not-edit-this-by-hand": {
+        "transitive-dependencies": {}
+    }
+}
