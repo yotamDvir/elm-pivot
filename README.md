@@ -71,8 +71,8 @@ update msg model =
           model |> Maybe.andThen P.removeGoR
     Add item ->
       model
-      -- Attempt to add to an existing collection.
-      |> Maybe.map (P.addGoR item)
+      -- Attempt to append to an existing collection.
+      |> Maybe.map (P.appendGoR item)
       -- Start from scratch otherwise.
       |> Maybe.withDefault (P.singleton item)
       -- Wrap back into a `Maybe`.
@@ -126,7 +126,7 @@ update msg model =
       model
 ```
 
-We decide that we want the user to be able to undo changes to the counters. To accomplish this, we add each new version of the model to a pivot instead of modifying it in place. This way we retain previous models, and can simply browse between them back and forth.
+We decide that we want the user to be able to undo changes to the counters. To accomplish this, we append each new version of the model to a pivot instead of modifying it in place. This way we retain previous models, and can simply browse between them back and forth.
 
 ```elm
 import Pivot as P exposing (Pivot)
@@ -195,7 +195,7 @@ update msg model =
       in
         model
         -- Adding the next state (instead of replacing the current one).
-        |> P.addGoR next
+        |> P.appendGoR next
 ```
 
 So we have undo, but we're recording every single state of the model. What if we only want part of the model to be undoable, say just the first counter? Below is just one possible implementation. I'll let you to try to make sense of it yourself.
@@ -249,7 +249,7 @@ counter1Update counter1Msg counter1 =
           P.getC counter1 + 1
       in
         counter1
-        |> P.addGoR next
+        |> P.appendGoR next
     Undo ->
       counter1
       |> P.withRollback P.goL

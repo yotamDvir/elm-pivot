@@ -528,10 +528,10 @@ appendR =
 
 
 {-| Add a member to the left of the center and immediately move left.
-We know that `addL >> goL` cannot really fail, but it still results in a
+We know that `appendL >> goL` cannot really fail, but it still results in a
 `Maybe` type. This avoids this issue.
 
-    addGoL >> Just == addL >> goL
+    appendGoL >> Just == appendL >> goL
 
 -}
 appendGoL : a -> Pivot a -> Pivot a
