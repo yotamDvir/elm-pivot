@@ -86,12 +86,12 @@ appendGoR val =
 
 appendListL : List a -> Pivot a -> Pivot a
 appendListL xs =
-    mapL_ (List.append xs)
+    mapWholeL (\l -> List.append l (List.reverse xs))
 
 
 appendListR : List a -> Pivot a -> Pivot a
 appendListR xs =
-    mapR_ (\rs -> List.foldl (::) rs xs)
+    mapWholeR (\r -> List.append r xs)
 
 
 sort : Pivot comparable -> Pivot comparable
