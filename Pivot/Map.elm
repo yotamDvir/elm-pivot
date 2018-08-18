@@ -7,13 +7,13 @@ import Pivot.Position exposing (..)
 
 
 mapCLR : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
-mapCLR onC onL onR =
-    mapCLR_ onC (List.map onL) (List.map onR)
+mapCLR onC onL onR (Pivot c ( l, r )) =
+    Pivot (onC c) ( List.map onL l, List.map onR r )
 
 
 mapCRL : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
-mapCRL onC =
-    flip (mapCLR onC)
+mapCRL onC onR onL =
+    mapCLR onC onL onR
 
 
 mapCS : (a -> b) -> (a -> b) -> Pivot a -> Pivot b
@@ -27,8 +27,8 @@ mapA onA =
 
 
 mapC : (a -> a) -> Pivot a -> Pivot a
-mapC =
-    flip mapCS identity
+mapC onC =
+    mapCS onC identity
 
 
 mapL : (a -> a) -> Pivot a -> Pivot a
@@ -37,9 +37,8 @@ mapL =
 
 
 mapR : (a -> a) -> Pivot a -> Pivot a
-mapR f =
-    mapL f
-        |> mirror
+mapR =
+    mapCLR identity identity
 
 
 mapS : (a -> a) -> Pivot a -> Pivot a
@@ -47,35 +46,34 @@ mapS =
     mapCS identity
 
 
-mapCLR_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCLR_ onC_ onL_ onR_ pvt =
-    Pivot (pvt |> getC |> onC_) ( pvt |> getL |> onL_ |> List.reverse, pvt |> getR |> onR_ )
+mapWholeCLR : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapWholeCLR onC onL onR (Pivot c ( l, r )) =
+    Pivot (onC c) ( onL l, onR r )
 
 
-mapCRL_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCRL_ onC_ =
-    flip (mapCLR_ onC_)
+mapWholeCRL : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapWholeCRL onC onR onL =
+    mapWholeCLR onC onL onR
 
 
-mapCS_ : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCS_ onC_ onS_ =
-    mapCLR_ onC_ onS_ onS_
+mapWholeCS : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapWholeCS onC onS =
+    mapWholeCLR onC onS onS
 
 
-mapL_ : (List a -> List a) -> Pivot a -> Pivot a
-mapL_ =
-    mapCRL_ identity identity
+mapWholeL : (List a -> List a) -> Pivot a -> Pivot a
+mapWholeL =
+    mapWholeCRL identity identity
 
 
-mapR_ : (List a -> List a) -> Pivot a -> Pivot a
-mapR_ f =
-    mapL_ f
-        |> mirror
+mapWholeR : (List a -> List a) -> Pivot a -> Pivot a
+mapWholeR =
+    mapWholeCLR identity identity
 
 
-mapS_ : (List a -> List a) -> Pivot a -> Pivot a
-mapS_ =
-    mapCS_ identity
+mapWholeS : (List a -> List a) -> Pivot a -> Pivot a
+mapWholeS =
+    mapWholeCS identity
 
 
 zip : Pivot a -> Pivot ( Int, a )
@@ -93,7 +91,7 @@ zip pvt =
         onR =
             List.indexedMap ((+) (n + 1) >> (,))
     in
-        mapCLR_ onC onL onR pvt
+        mapWholeCLR onC onL onR pvt
 
 
 apply : Pivot (a -> b) -> Pivot a -> Pivot b
