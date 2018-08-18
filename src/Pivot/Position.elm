@@ -1,9 +1,9 @@
 module Pivot.Position
     exposing
-        ( goBy
+        ( goAbsolute
         , goL
         , goR
-        , goTo
+        , goRelative
         , goToEnd
         , goToStart
         , lengthA
@@ -31,21 +31,21 @@ goL =
     goR |> mirrorM
 
 
-goBy : Int -> Pivot a -> Maybe (Pivot a)
-goBy steps pvt =
+goRelative : Int -> Pivot a -> Maybe (Pivot a)
+goRelative steps pvt =
     if steps == 0 then
         Just pvt
 
     else if steps > 0 then
-        goR pvt |> Maybe.andThen (goBy (steps - 1))
+        goR pvt |> Maybe.andThen (goRelative (steps - 1))
 
     else
-        goL pvt |> Maybe.andThen (goBy (steps + 1))
+        goL pvt |> Maybe.andThen (goRelative (steps + 1))
 
 
-goTo : Int -> Pivot a -> Maybe (Pivot a)
-goTo dest =
-    goToStart >> goBy dest
+goAbsolute : Int -> Pivot a -> Maybe (Pivot a)
+goAbsolute dest =
+    goToStart >> goRelative dest
 
 
 goToStart : Pivot a -> Pivot a
