@@ -4,18 +4,17 @@ module Pivot.Map
         , mapA
         , mapC
         , mapCLR
-        , mapCLR_
         , mapCRL
-        , mapCRL_
         , mapCS
-        , mapCS_
         , mapL
-        , mapL_
         , mapR
-        , mapR_
         , mapS
-        , mapS_
-        , zip
+        , mapWholeCLR
+        , mapWholeCRL
+        , mapWholeCS
+        , mapWholeL
+        , mapWholeR
+        , mapWholeS
         )
 
 import Pivot.Get exposing (..)
