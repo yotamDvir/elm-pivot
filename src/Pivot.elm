@@ -20,14 +20,18 @@ module Pivot
         , getC
         , getL
         , getR
+        , goAbsolute
         , goBy
         , goL
         , goR
+        , goRelative
         , goTo
         , goToEnd
         , goToStart
         , hasL
         , hasR
+        , indexAbsolute
+        , indexRelative
         , lastWith
         , lengthA
         , lengthL
@@ -35,17 +39,17 @@ module Pivot
         , mapA
         , mapC
         , mapCLR
-        , mapCLR_
         , mapCRL
-        , mapCRL_
         , mapCS
-        , mapCS_
         , mapL
-        , mapL_
         , mapR
-        , mapR_
         , mapS
-        , mapS_
+        , mapWholeCLR
+        , mapWholeCRL
+        , mapWholeCS
+        , mapWholeL
+        , mapWholeR
+        , mapWholeS
         , mirror
         , mirrorM
         , removeGoL
@@ -60,7 +64,6 @@ module Pivot
         , switchL
         , switchR
         , withRollback
-        , zip
         )
 
 {-| A pivot is a list upgraded with a center and sides. However, a pivot
@@ -116,7 +119,7 @@ you'd get the same thing you would by applying `getA` beforehand.
 
 ## Momentum
 
-@docs goR, goL, goBy, goTo, goToStart, goToEnd
+@docs goR, goL, goRelative, goBy, goAbsolute, goTo, goToStart, goToEnd
 
 
 ## Find
@@ -163,26 +166,17 @@ Switch places with other members.
 
 Lists can be mapped over, and so can pivots.
 However, since a pivot is made up of three distinct objects at any time,
-it makes sense that you may want to apply different transformations to
-the different objects.
+you may want to apply different transformations to the different objects.
 
 
-## Maps
+## As individuals
 
-@docs mapCLR, mapCRL, mapCS, mapA
-
-
-## Constraint Maps
-
-If you want to map only over some of the pivot,
-then you must retain the type.
-
-@docs mapC, mapS, mapL, mapR
+@docs mapCLR, mapCRL, mapCS, mapA, mapC, mapS, mapL, mapR
 
 
 ## As a whole
 
-Some `List a -> List a` functions cannot be made from `a -> a` functions.
+Some `List a -> List b` functions cannot be made from `a -> b` functions.
 This is why these maps may be of importance.
 Just replace `map*` with `mapWhole*` to use functions on whole lists instead of values.
 
@@ -191,7 +185,7 @@ Just replace `map*` with `mapWhole*` to use functions on whole lists instead of 
 
 ## Special
 
-@docs zip, apply
+@docs indexAbsolute, indexRelative, apply
 
 
 # Utilities
@@ -211,6 +205,10 @@ import Pivot.Utilities as Utilities
 
 
 {-| Pivot is an opaque data type.
+A Pivot represents a list with a pointer to the center.
+
+A pivot of the list `[1, 2, 3, 4]` with 3 as the center shall be represented by `[1 2 *3* 4]`.
+
 -}
 type alias Pivot a =
     Pivot.Types.Pivot a
@@ -221,6 +219,7 @@ type alias Pivot a =
 _Fails if and only if the list given is empty._
 
     fromList [] == Nothing
+    fromList [1, 2, 3, 4] == [*1* 2 3 4]
 
 -}
 fromList : List a -> Maybe (Pivot a)
@@ -230,10 +229,10 @@ fromList =
 
 {-| Like `fromList`, but by specifying the center explicitly, it cannot fail.
 
-    getC (fromCons "well" ["hello", "world"]) == "well"
-    getL (fromCons "well" ["hello", "world"]) == []
-    getR (fromCons "well" ["hello", "world"]) == ["hello", "world"]
-    Just (fromCons 1 [2..4]) == fromList [1..4]
+    getC [1 2 *3* 4] == 3
+    getL [1 2 *3* 4] == [1, 2]
+    getR [1 2 *3* 4] == [4]
+    Just (fromCons 1 [2, 3, 4]) == fromList [1, 2, 3, 4]
 
 -}
 fromCons : a -> List a -> Pivot a
@@ -243,7 +242,7 @@ fromCons =
 
 {-| Like `fromCons`, but without the list. That is, we specify only the center.
 
-    singleton == flip fromCons []
+    singleton a == fromCons a []
 
 -}
 singleton : a -> Pivot a
@@ -280,6 +279,13 @@ getR =
 getA : Pivot a -> List a
 getA =
     Get.getA
+
+
+{-| Alias for `getA`
+-}
+toList : Pivot a -> List a
+toList =
+    getA
 
 
 {-| Check if the left side is not empty.
@@ -320,7 +326,7 @@ lastWith =
 
 _Fails if and only if there are no such members._
 
-    findR ((==) 3) (fromCons 1 [2..4]) == (singleton 3 |> setL [1, 2] |> setR [4])
+    findR ((==) 3) [1 2 *3* 4] == Nothing
 
 -}
 findR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
@@ -332,6 +338,8 @@ findR =
 
 _Fails if and only if there are no such members._
 
+    findL ((==) 2) [1 2 *3* 4] == Just [1 *2* 3 4]
+
 -}
 findL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
 findL =
@@ -342,7 +350,8 @@ findL =
 
 _Fails if and only if there are no such members._
 
-    firstWith == \pred -> goToStart >> findCR pred
+    findCR ((==) 3) [1 2 *3* 4] == Just [1 2 *3* 4]
+    firstWith pred == goToStart >> findCR pred
 
 -}
 findCR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
@@ -364,10 +373,10 @@ findCL =
 
 _Fails if and only if the right side is empty._
 
-Tip: You can avoid the failure using `withRollback`,
-and instead have a possible no-op. See **Utilities**.
+Tip: `withRollback` replaces failures with no-ops (see **Utilities**).
 
-    fromCons 1 [2..4] |> goR /= Nothing
+    goR [1 *2* 3 4] == Just [1 2 *3* 4]
+    goR [1 2 3 *4*] == Nothing
 
 -}
 goR : Pivot a -> Maybe (Pivot a)
@@ -379,23 +388,27 @@ goR =
 
 _Fails if and only if the left side is empty._
 
-    goL (fromCons 1 [2..4]) == Nothing
-    withRollback goL (fromCons 1 [2..4]) == fromCons 1 [2..4]
-
 -}
 goL : Pivot a -> Maybe (Pivot a)
 goL =
     Position.goL
 
 
-{-| Move right by some number of steps. Negative number moves left instead.
+{-| Move right by some number of steps. Negative numbers move left instead.
 
 _Fails if and only if the movement goes out of bounds._
 
 -}
+goRelative : Int -> Pivot a -> Maybe (Pivot a)
+goRelative =
+    Position.goRelative
+
+
+{-| Alias for `goRelative`.
+-}
 goBy : Int -> Pivot a -> Maybe (Pivot a)
 goBy =
-    Position.goBy
+    Position.goRelative
 
 
 {-| Go to a specific position from the left. Starts with 0.
@@ -403,14 +416,21 @@ goBy =
 _Fails if and only if the position given doesn't exist._
 
 -}
+goAbsolute : Int -> Pivot a -> Maybe (Pivot a)
+goAbsolute =
+    Position.goAbsolute
+
+
+{-| Alias for `goAbsolute`
+-}
 goTo : Int -> Pivot a -> Maybe (Pivot a)
 goTo =
-    Position.goTo
+    Position.goAbsolute
 
 
 {-| Go to starting position.
 
-    goToStart >> lengthL == 0
+    goToStart >> lengthL == always 0
 
 -}
 goToStart : Pivot a -> Pivot a
@@ -420,7 +440,7 @@ goToStart =
 
 {-| Go to starting position.
 
-    goToEnd >> lengthR == 0
+    goToEnd >> lengthR == always 0
 
 -}
 goToEnd : Pivot a -> Pivot a
@@ -444,7 +464,7 @@ lengthR =
 
 {-| Length of the pivot.
 
-    lengthA == \p -> lengthL p + 1 + lengthR p
+    lengthA pvt == lengthL pvt + 1 + lengthR pvt
 
 -}
 lengthA : Pivot a -> Int
@@ -546,14 +566,20 @@ appendGoR =
     Modify.appendGoR
 
 
-{-| Append a list to the front of the left.
+{-| Like `List.append`, but the right side is a pivot.
+
+    appendListL [8, 9] [1 2 *3* 4] == [8 9 1 2 *3* 4]
+
 -}
 appendListL : List a -> Pivot a -> Pivot a
 appendListL =
     Modify.appendListL
 
 
-{-| Append a list to the back of the right.
+{-| Like `List.append`, but the left side is a pivot.
+
+    appendListR [8, 9] [1 2 *3* 4] == [1 2 *3* 4 8 9]
+
 -}
 appendListR : List a -> Pivot a -> Pivot a
 appendListR =
@@ -584,7 +610,7 @@ sortWith =
 
 
 {-| Provide functions that control what happens to the center,
-the left members and the right member separately,
+the left members and the right members separately,
 and get a function that acts on pivots.
 -}
 mapCLR : (a -> b) -> (a -> b) -> (a -> b) -> Pivot a -> Pivot b
@@ -610,6 +636,7 @@ mapCS =
 This is exactly like `List.map` for the underlying list.
 
     mapA ((==) 3) [1 *2* 3 4] == [False *False* True False]
+
 -}
 mapA : (a -> b) -> Pivot a -> Pivot b
 mapA =
@@ -644,11 +671,12 @@ mapS =
     Map.mapS
 
 
-{-| Like `mapWholeCLR`, but the functions for the left and right act on the
+{-| Like `mapCLR`, but the functions for the left and right act on the
 lists as a whole, and not on each member separately.
 The lists are ordered from the center out.
 
     mapWholeCLR ((*) 3) (List.drop 1) (List.drop 1) [1 2 *3* 4 5] == [1 *9* 5]
+
 -}
 mapWholeCLR : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
 mapWholeCLR =
@@ -690,12 +718,25 @@ mapWholeS =
     Map.mapWholeS
 
 
-{-| Adds indices to the values.
+{-| Adds indices to all values, from left to right.
 Based internally on `List.indexedMap`.
+
+    indexAbsolute [1 2 *3* 4] == [(0,1) (1,2) *(2,3)* (3,4)]
+
 -}
-zip : Pivot a -> Pivot ( Int, a )
-zip =
-    Map.zip
+indexAbsolute : Pivot a -> Pivot ( Int, a )
+indexAbsolute =
+    Map.indexAbsolute
+
+
+{-| Like `indexAbsolute`, but relative to the center (that gets the index 0).
+
+    indexAbsolute [1 2 *3* 4] == [(-2,1) (-1,2) *(0,3)* (1,4)]
+
+-}
+indexRelative : Pivot a -> Pivot ( Int, a )
+indexRelative =
+    Map.indexRelative
 
 
 {-| Apply functions in a pivot on values in another Pivot.
@@ -705,7 +746,7 @@ But how does a list of functions get applied on a list of values?
 Well, each function maps over the complete list of values,
 and then all the lists created from these applications are concatinated.
 
-    mapCLR onC onL onR == (singleton onC |> setL [ onL ] |> setR [ onR ] |> apply)
+    mapCLR onC onL onR == apply [onL *onC* onR]
 
 -}
 apply : Pivot (a -> b) -> Pivot a -> Pivot b
@@ -769,10 +810,3 @@ really fail. For example,
 withRollback : (a -> Maybe a) -> a -> a
 withRollback =
     Utilities.withRollback
-
-
-{-| alias for `getA`
--}
-toList : Pivot a -> List a
-toList =
-    getA
