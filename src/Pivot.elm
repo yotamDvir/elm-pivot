@@ -184,9 +184,9 @@ then you must retain the type.
 
 Some `List a -> List a` functions cannot be made from `a -> a` functions.
 This is why these maps may be of importance.
-Just add `_` to a `map*` function to use functions on lists instead of values.
+Just replace `map*` with `mapWhole*` to use functions on whole lists instead of values.
 
-@docs mapCLR_, mapCRL_, mapCS_, mapS_, mapL_, mapR_
+@docs mapWholeCLR, mapWholeCRL, mapWholeCS, mapWholeS, mapWholeL, mapWholeR
 
 
 ## Special
@@ -609,8 +609,7 @@ mapCS =
 {-| Like `mapCS`, but you provide one function for all members.
 This is exactly like `List.map` for the underlying list.
 
-    mapA ((==) 3) (fromCons 1 [2..4]) == fromCons False [False, True, False]
-
+    mapA ((==) 3) [1 *2* 3 4] == [False *False* True False]
 -}
 mapA : (a -> b) -> Pivot a -> Pivot b
 mapA =
@@ -645,47 +644,50 @@ mapS =
     Map.mapS
 
 
-{-| Like `mapCLR`, but the functions for the left and right act on the
+{-| Like `mapWholeCLR`, but the functions for the left and right act on the
 lists as a whole, and not on each member separately.
+The lists are ordered from the center out.
+
+    mapWholeCLR ((*) 3) (List.drop 1) (List.drop 1) [1 2 *3* 4 5] == [1 *9* 5]
 -}
-mapCLR_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCLR_ =
-    Map.mapCLR_
+mapWholeCLR : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapWholeCLR =
+    Map.mapWholeCLR
 
 
-{-| See `mapCLR_`.
+{-| See `mapWholeCLR`.
 -}
-mapCRL_ : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCRL_ =
-    Map.mapCRL_
+mapWholeCRL : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapWholeCRL =
+    Map.mapWholeCRL
 
 
-{-| See `mapCLR_`.
+{-| See `mapWholeCLR`.
 -}
-mapCS_ : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
-mapCS_ =
-    Map.mapCS_
+mapWholeCS : (a -> b) -> (List a -> List b) -> Pivot a -> Pivot b
+mapWholeCS =
+    Map.mapWholeCS
 
 
-{-| See `mapCLR_`.
+{-| See `mapWholeCLR`.
 -}
-mapL_ : (List a -> List a) -> Pivot a -> Pivot a
-mapL_ =
-    Map.mapL_
+mapWholeL : (List a -> List a) -> Pivot a -> Pivot a
+mapWholeL =
+    Map.mapWholeL
 
 
-{-| See `mapCLR_`.
+{-| See `mapWholeCLR`.
 -}
-mapR_ : (List a -> List a) -> Pivot a -> Pivot a
-mapR_ =
-    Map.mapR_
+mapWholeR : (List a -> List a) -> Pivot a -> Pivot a
+mapWholeR =
+    Map.mapWholeR
 
 
-{-| See `mapCLR_`.
+{-| See `mapWholeCLR`.
 -}
-mapS_ : (List a -> List a) -> Pivot a -> Pivot a
-mapS_ =
-    Map.mapS_
+mapWholeS : (List a -> List a) -> Pivot a -> Pivot a
+mapWholeS =
+    Map.mapWholeS
 
 
 {-| Adds indices to the values.
