@@ -1,6 +1,8 @@
 module Pivot.Map
     exposing
         ( apply
+        , indexAbsolute
+        , indexRelative
         , mapA
         , mapC
         , mapCLR
@@ -93,22 +95,37 @@ mapWholeS =
     mapWholeCS identity
 
 
-zip : Pivot a -> Pivot ( Int, a )
-zip pvt =
+indexAbsolute : Pivot a -> Pivot ( Int, a )
+indexAbsolute pvt =
     let
         n =
             lengthL pvt
 
-        onC b =
-            ( n, b )
+        onC x =
+            ( n, x )
 
         onL =
-            List.indexedMap (\a b -> ( a, b ))
+            List.indexedMap (\i x -> ( n - i - 1, x ))
 
         onR =
-            List.indexedMap ((+) (n + 1) >> (\a b -> ( a, b )))
+            List.indexedMap ((+) (n + 1) >> (\i x -> ( i, x )))
     in
-        mapWholeCLR onC onL onR pvt
+    mapWholeCLR onC onL onR pvt
+
+
+indexRelative : Pivot a -> Pivot ( Int, a )
+indexRelative pvt =
+    let
+        onC x =
+            ( 0, x )
+
+        onL =
+            List.indexedMap (\i x -> ( -1 - i, x ))
+
+        onR =
+            List.indexedMap (\i x -> ( i + 1, x ))
+    in
+    mapWholeCLR onC onL onR pvt
 
 
 apply : Pivot (a -> b) -> Pivot a -> Pivot b
