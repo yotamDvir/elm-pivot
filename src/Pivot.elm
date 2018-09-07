@@ -219,7 +219,7 @@ type alias Pivot a =
 _Fails if and only if the list given is empty._
 
     fromList [] == Nothing
-    fromList [1, 2, 3, 4] == [*1* 2 3 4]
+    fromList [1, 2, 3, 4] == Just [*1* 2 3 4]
 
 -}
 fromList : List a -> Maybe (Pivot a)
@@ -229,10 +229,8 @@ fromList =
 
 {-| Like `fromList`, but by specifying the center explicitly, it cannot fail.
 
-    getC [1 2 *3* 4] == 3
-    getL [1 2 *3* 4] == [1, 2]
-    getR [1 2 *3* 4] == [4]
-    Just (fromCons 1 [2, 3, 4]) == fromList [1, 2, 3, 4]
+    fromCons 1 [2, 3, 4] == [*1* 2 3 4]
+    Just (fromCons h t) == fromList (h :: t)
 
 -}
 fromCons : a -> List a -> Pivot a
@@ -242,7 +240,8 @@ fromCons =
 
 {-| Like `fromCons`, but without the list. That is, we specify only the center.
 
-    singleton a == fromCons a []
+    singleton 3 == [*3*]
+    singleton x == fromCons x []
 
 -}
 singleton : a -> Pivot a
@@ -252,6 +251,7 @@ singleton =
 
 {-| Get the center member.
 
+    getC [1 2 *3* 4] == 3
     singleton >> getC == identity
 
 -}
@@ -261,6 +261,9 @@ getC =
 
 
 {-| Get the left side list.
+
+    getL [1 2 *3* 4] == [1, 2]
+
 -}
 getL : Pivot a -> List a
 getL =
@@ -268,6 +271,9 @@ getL =
 
 
 {-| Get the right side list.
+
+    getR [1 2 *3* 4] == [4]
+
 -}
 getR : Pivot a -> List a
 getR =
@@ -275,6 +281,9 @@ getR =
 
 
 {-| Make the pivot into a list.
+
+    getA [1 2 *3* 4] == [1, 2, 3, 4]
+
 -}
 getA : Pivot a -> List a
 getA =
@@ -375,8 +384,8 @@ _Fails if and only if the right side is empty._
 
 Tip: `withRollback` replaces failures with no-ops (see **Utilities**).
 
-    goR [1 *2* 3 4] == Just [1 2 *3* 4]
     goR [1 2 3 *4*] == Nothing
+    goR [1 *2* 3 4] == Just [1 2 *3* 4]
 
 -}
 goR : Pivot a -> Maybe (Pivot a)
