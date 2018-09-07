@@ -3,6 +3,7 @@ module Examples.Undo.Entire exposing (..)
 import Pivot as P exposing (Pivot)
 
 
+
 -- This was the model before.
 
 
@@ -80,6 +81,6 @@ update msg model =
                     P.getC model
                         |> updateRec msgRec
             in
-                -- Adding the next state.
-                model
-                    |> P.addGoR next
+            -- Adding the next state.
+            model
+                |> P.appendGoR next

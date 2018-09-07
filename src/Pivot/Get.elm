@@ -16,7 +16,7 @@ getL (Pivot _ ( l, _ )) =
 
 hasL : Pivot a -> Bool
 hasL =
-    getL >> List.length >> flip (>) 0
+    getL >> List.isEmpty >> not
 
 
 getR : Pivot a -> List a
@@ -26,7 +26,7 @@ getR (Pivot _ ( _, r )) =
 
 hasR : Pivot a -> Bool
 hasR =
-    reverse >> hasL
+    getR >> List.isEmpty >> not
 
 
 getA : Pivot a -> List a

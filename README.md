@@ -71,8 +71,8 @@ update msg model =
           model |> Maybe.andThen P.removeGoR
     Add item ->
       model
-      -- Attempt to add to an existing collection.
-      |> Maybe.map (P.addGoR item)
+      -- Attempt to append to an existing collection.
+      |> Maybe.map (P.appendGoR item)
       -- Start from scratch otherwise.
       |> Maybe.withDefault (P.singleton item)
       -- Wrap back into a `Maybe`.
@@ -126,7 +126,7 @@ update msg model =
       model
 ```
 
-We decide that we want the user to be able to undo changes to the counters. To accomplish this, we add each new version of the model to a pivot instead of modifying it in place. This way we retain previous models, and can simply browse between them back and forth.
+We decide that we want the user to be able to undo changes to the counters. To accomplish this, we append each new version of the model to a pivot instead of modifying it in place. This way we retain previous models, and can simply browse between them back and forth.
 
 ```elm
 import Pivot as P exposing (Pivot)
@@ -195,7 +195,7 @@ update msg model =
       in
         model
         -- Adding the next state (instead of replacing the current one).
-        |> P.addGoR next
+        |> P.appendGoR next
 ```
 
 So we have undo, but we're recording every single state of the model. What if we only want part of the model to be undoable, say just the first counter? Below is just one possible implementation. I'll let you to try to make sense of it yourself.
@@ -249,7 +249,7 @@ counter1Update counter1Msg counter1 =
           P.getC counter1 + 1
       in
         counter1
-        |> P.addGoR next
+        |> P.appendGoR next
     Undo ->
       counter1
       |> P.withRollback P.goL
@@ -260,30 +260,7 @@ counter1Update counter1Msg counter1 =
 
 # Alternatives
 
-* The [undo-redo](http://package.elm-lang.org/packages/elm-community/undo-redo) library holds all states in a Pivot-like structure and lets you undo and redo through them. It is actually very similar to this library, but exposes less methods, and is semantically odd to use when doing anything that isn't undo/redo.
-* The [elm-multiway-tree-zipper](http://package.elm-lang.org/packages/tomjkidd/elm-multiway-tree-zipper/) library is much closer to the [zipper](http://learnyouahaskell.com/zippers) from Haskell, and provides a much more extensive structure, but exposes much less methods, and is unnecessarily complicated if you are dealing with a structure that resembles a list and not a tree.
-* The [listzipper](http://package.elm-lang.org/packages/wernerdegroot/listzipper/) library exposes the same structure, but has only a handful of methods and at the time of writing is not up to date with the most recent version of Elm.
+There are a few alternatives to this package.
 
-# What's next
-
-## Generalizations
-
-Right now the center must have the same type as the members of the sides. One possible generalization is to let the center have any arbitrary type, but then the pivot will need to be equipped with transformation functions for moving the member from the sides to the center and vice-verse.
-
-For example, you may want to use a pivot to observe codons inside genetic code, but a codon is a 3-tuple of nucleotides, while you may want to move about the genetic code a single nucleotide at a time.
-
-```elm
--- Reading genetic code, with a generalized pivot.
-type Nucleotide = A | T | G | C
-type alias Codon = (Nucleotide, Nucleotide, Nucleotide)
-fromL n (n1, n2, n3) = (n, n1, n2)
-toR (n1, n2, n3) = n3
-reverseC (n1, n2, n3) = (n3, n2, n1)
-type alias GeneticCode = GeneralizedPivot fromL toR reverseC Codon Nucleotide
-```
-
-If this or any other generalization are wanted, please post an issue in the repository. Even better, help create it!
-
-## More methods
-
-If you feel this library is lacking a method you think would rock, please post an issue in the repository.
+* The [jjant/elm-comonad-zipper](http://package.elm-lang.org/packages/latest/jjant/elm-comonad-zipper) and [wernerdegroot/listzipper](http://package.elm-lang.org/packages/latest/wernerdegroot/listzipper) packages provide essentially the same structure but less methods to manipulate and process it.
+* The [miyamoen/tree-with-zipper](http://package.elm-lang.org/packages/latest/miyamoen/tree-with-zipper) and [zwilias/elm-rosetree](http://package.elm-lang.org/packages/latest/zwilias/elm-rosetree) packages provide a more expressive tree-like structure which complicates its usage.
