@@ -4,6 +4,7 @@ module Pivot.Utilities
         , mirror
         , mirrorM
         , reverse
+        , reversePrependList
         , withRollback
         )
 
@@ -52,3 +53,13 @@ assert (Pivot mc ( ml, mr )) =
 withRollback : (a -> Maybe a) -> a -> a
 withRollback f x =
     f x |> Maybe.withDefault x
+
+
+reversePrependList : List a -> List a -> List a
+reversePrependList l r =
+    case l of
+        x :: xs ->
+            reversePrependList xs (x :: r)
+
+        _ ->
+            r

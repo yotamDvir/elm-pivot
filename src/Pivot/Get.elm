@@ -46,14 +46,4 @@ getA (Pivot c ( l, r )) =
 
 getAOptimized : Pivot a -> List a
 getAOptimized (Pivot c ( l, r )) =
-    reversePrepend l (c :: r)
-
-
-reversePrepend : List a -> List a -> List a
-reversePrepend l1 l2 =
-    case l1 of
-        l :: ls ->
-            reversePrepend ls (l :: l2)
-
-        _ ->
-            l2
+    reversePrependList l (c :: r)
