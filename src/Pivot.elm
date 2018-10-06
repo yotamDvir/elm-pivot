@@ -1,70 +1,21 @@
-module Pivot
-    exposing
-        ( Pivot
-        , appendGoL
-        , appendGoR
-        , appendL
-        , appendListL
-        , appendListR
-        , appendR
-        , apply
-        , assert
-        , findCL
-        , findCR
-        , findL
-        , findR
-        , firstWith
-        , fromCons
-        , fromList
-        , getA
-        , getC
-        , getL
-        , getR
-        , goAbsolute
-        , goBy
-        , goL
-        , goR
-        , goRelative
-        , goTo
-        , goToEnd
-        , goToStart
-        , hasL
-        , hasR
-        , indexAbsolute
-        , indexRelative
-        , lastWith
-        , lengthA
-        , lengthL
-        , lengthR
-        , mapA
-        , mapC
-        , mapCLR
-        , mapCRL
-        , mapCS
-        , mapL
-        , mapR
-        , mapS
-        , mapWholeCLR
-        , mapWholeCRL
-        , mapWholeCS
-        , mapWholeL
-        , mapWholeR
-        , mapWholeS
-        , mirror
-        , mirrorM
-        , removeGoL
-        , removeGoR
-        , reverse
-        , setC
-        , setL
-        , setR
-        , singleton
-        , sort
-        , sortWith
-        , switchL
-        , switchR
-        , withRollback
-        )
+module Pivot exposing
+    ( Pivot
+    , fromList, fromCons, singleton
+    , getC, getL, getR, getA, hasL, hasR
+    , lengthL, lengthR, lengthA
+    , goR, goL, goRelative, goBy, goAbsolute, goTo, goToStart, goToEnd
+    , firstWith, lastWith, findR, findL, findCR, findCL
+    , setC, setL, setR
+    , appendL, appendR, appendGoL, appendGoR, appendListL, appendListR
+    , removeGoL, removeGoR
+    , switchL, switchR
+    , sort, sortWith
+    , mapCLR, mapCRL, mapCS, mapA, mapC, mapS, mapL, mapR
+    , mapWholeCLR, mapWholeCRL, mapWholeCS, mapWholeS, mapWholeL, mapWholeR
+    , indexAbsolute, indexRelative, apply
+    , reverse, mirror, mirrorM, assert, withRollback
+    , toList
+    )
 
 {-| A pivot is a list upgraded with a center and sides. However, a pivot
 can never be empty, so it is better to think of it an upgraded cons list.
@@ -251,7 +202,8 @@ singleton =
 
 {-| Get the center member.
 
-    getC [1 2 *3* 4] == 3
+    getC [ 1 2 * 3 * 4 ] == 3
+
     singleton >> getC == identity
 
 -}
@@ -262,7 +214,7 @@ getC =
 
 {-| Get the left side list.
 
-    getL [1 2 *3* 4] == [1, 2]
+    getL [ 1 2 * 3 * 4 ] == [ 1, 2 ]
 
 -}
 getL : Pivot a -> List a
@@ -272,7 +224,7 @@ getL =
 
 {-| Get the right side list.
 
-    getR [1 2 *3* 4] == [4]
+    getR [ 1 2 * 3 * 4 ] == [ 4 ]
 
 -}
 getR : Pivot a -> List a
@@ -282,7 +234,7 @@ getR =
 
 {-| Make the pivot into a list.
 
-    getA [1 2 *3* 4] == [1, 2, 3, 4]
+    getA [ 1 2 * 3 * 4 ] == [ 1, 2, 3, 4 ]
 
 -}
 getA : Pivot a -> List a
@@ -335,7 +287,7 @@ lastWith =
 
 _Fails if and only if there are no such members._
 
-    findR ((==) 3) [1 2 *3* 4] == Nothing
+    findR ((==) 3) [ 1 2 * 3 * 4 ] == Nothing
 
 -}
 findR : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
@@ -347,7 +299,7 @@ findR =
 
 _Fails if and only if there are no such members._
 
-    findL ((==) 2) [1 2 *3* 4] == Just [1 *2* 3 4]
+    findL ((==) 2) [ 1 2 * 3 * 4 ] == Just [ 1 * 2 * 3 4 ]
 
 -}
 findL : (a -> Bool) -> Pivot a -> Maybe (Pivot a)
@@ -359,7 +311,8 @@ findL =
 
 _Fails if and only if there are no such members._
 
-    findCR ((==) 3) [1 2 *3* 4] == Just [1 2 *3* 4]
+    findCR ((==) 3) [ 1 2 * 3 * 4 ] == Just [ 1 2 * 3 * 4 ]
+
     firstWith pred == goToStart >> findCR pred
 
 -}
@@ -577,7 +530,7 @@ appendGoR =
 
 {-| Like `List.append`, but the right side is a pivot.
 
-    appendListL [8, 9] [1 2 *3* 4] == [8 9 1 2 *3* 4]
+    appendListL [ 8, 9 ] [ 1 2 * 3 * 4 ] == [ 8 9 1 2 * 3 * 4 ]
 
 -}
 appendListL : List a -> Pivot a -> Pivot a
@@ -587,7 +540,7 @@ appendListL =
 
 {-| Like `List.append`, but the left side is a pivot.
 
-    appendListR [8, 9] [1 2 *3* 4] == [1 2 *3* 4 8 9]
+    appendListR [ 8, 9 ] [ 1 2 * 3 * 4 ] == [ 1 2 * 3 * 4 8 9 ]
 
 -}
 appendListR : List a -> Pivot a -> Pivot a
@@ -600,6 +553,7 @@ appendListR =
 It does not simply sort each side separately!
 
     sort >> getA == getA >> List.sort
+
     getC == sort >> getC
 
 -}
@@ -644,7 +598,7 @@ mapCS =
 {-| Like `mapCS`, but you provide one function for all members.
 This is exactly like `List.map` for the underlying list.
 
-    mapA ((==) 3) [1 *2* 3 4] == [False *False* True False]
+    mapA ((==) 3) [ 1 * 2 * 3 4 ] == [ False * False * True False ]
 
 -}
 mapA : (a -> b) -> Pivot a -> Pivot b
@@ -684,7 +638,7 @@ mapS =
 lists as a whole, and not on each member separately.
 The lists are ordered from the center out.
 
-    mapWholeCLR ((*) 3) (List.drop 1) (List.drop 1) [1 2 *3* 4 5] == [1 *9* 5]
+    mapWholeCLR ((*) 3) (List.drop 1) (List.drop 1) [ 1 2 * 3 * 4 5 ] == [ 1 * 9 * 5 ]
 
 -}
 mapWholeCLR : (a -> b) -> (List a -> List b) -> (List a -> List b) -> Pivot a -> Pivot b
@@ -730,7 +684,7 @@ mapWholeS =
 {-| Adds indices to all values, from left to right.
 Based internally on `List.indexedMap`.
 
-    indexAbsolute [1 2 *3* 4] == [(0,1) (1,2) *(2,3)* (3,4)]
+    indexAbsolute [ 1 2 * 3 * 4 ] == [ ( 0, 1 ) ( 1, 2 ) * ( 2, 3 ) * ( 3, 4 ) ]
 
 -}
 indexAbsolute : Pivot a -> Pivot ( Int, a )
@@ -740,7 +694,7 @@ indexAbsolute =
 
 {-| Like `indexAbsolute`, but relative to the center (that gets the index 0).
 
-    indexAbsolute [1 2 *3* 4] == [(-2,1) (-1,2) *(0,3)* (1,4)]
+    indexAbsolute [ 1 2 * 3 * 4 ] == [ ( -2, 1 ) ( -1, 2 ) * ( 0, 3 ) * ( 1, 4 ) ]
 
 -}
 indexRelative : Pivot a -> Pivot ( Int, a )
@@ -755,7 +709,7 @@ But how does a list of functions get applied on a list of values?
 Well, each function maps over the complete list of values,
 and then all the lists created from these applications are concatinated.
 
-    mapCLR onC onL onR == apply [onL *onC* onR]
+    mapCLR onC onL onR == apply [ onL * onC * onR ]
 
 -}
 apply : Pivot (a -> b) -> Pivot a -> Pivot b

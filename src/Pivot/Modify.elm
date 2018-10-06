@@ -1,21 +1,4 @@
-module Pivot.Modify
-    exposing
-        ( appendGoL
-        , appendGoR
-        , appendL
-        , appendListL
-        , appendListR
-        , appendR
-        , removeGoL
-        , removeGoR
-        , setC
-        , setL
-        , setR
-        , sort
-        , sortWith
-        , switchL
-        , switchR
-        )
+module Pivot.Modify exposing (appendGoL, appendGoR, appendL, appendListL, appendListR, appendR, removeGoL, removeGoR, setC, setL, setR, sort, sortWith, switchL, switchR)
 
 import Pivot.Create exposing (..)
 import Pivot.Get exposing (..)

@@ -1,9 +1,4 @@
-module Pivot.Create
-    exposing
-        ( fromCons
-        , fromList
-        , singleton
-        )
+module Pivot.Create exposing (fromCons, fromList, singleton)
 
 import Pivot.Get exposing (..)
 import Pivot.Types exposing (..)

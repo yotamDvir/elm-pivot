@@ -1,4 +1,4 @@
-module Pivot.Types exposing (..)
+module Pivot.Types exposing (Left, Pivot(..), Right, Sides)
 
 
 type Pivot a

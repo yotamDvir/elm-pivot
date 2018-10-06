@@ -1,4 +1,4 @@
-module Pivot.Get exposing (..)
+module Pivot.Get exposing (getA, getC, getL, getR, hasL, hasR)
 
 import Pivot.Types exposing (..)
 import Pivot.Utilities exposing (..)
@@ -15,8 +15,8 @@ getL (Pivot _ ( l, _ )) =
 
 
 hasL : Pivot a -> Bool
-hasL =
-    getL >> List.isEmpty >> not
+hasL (Pivot _ ( l, _ )) =
+    not (List.isEmpty l)
 
 
 getR : Pivot a -> List a
@@ -25,10 +25,10 @@ getR (Pivot _ ( _, r )) =
 
 
 hasR : Pivot a -> Bool
-hasR =
-    getR >> List.isEmpty >> not
+hasR (Pivot _ ( _, r )) =
+    not (List.isEmpty r)
 
 
 getA : Pivot a -> List a
 getA (Pivot c ( l, r )) =
-    List.reverse l ++ c :: r
+    reversePrependList l (c :: r)
