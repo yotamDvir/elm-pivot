@@ -1,4 +1,4 @@
-module Pivot.Get exposing (..)
+module Pivot.Get exposing (getA, getAOptimized, getC, getL, getR, hasL, hasLOptimized, hasR, hasROptimized)
 
 import Pivot.Types exposing (..)
 import Pivot.Utilities exposing (..)

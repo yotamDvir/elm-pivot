@@ -1,23 +1,4 @@
-module Pivot.Map
-    exposing
-        ( apply
-        , indexAbsolute
-        , indexRelative
-        , mapA
-        , mapC
-        , mapCLR
-        , mapCRL
-        , mapCS
-        , mapL
-        , mapR
-        , mapS
-        , mapWholeCLR
-        , mapWholeCRL
-        , mapWholeCS
-        , mapWholeL
-        , mapWholeR
-        , mapWholeS
-        )
+module Pivot.Map exposing (apply, indexAbsolute, indexRelative, mapA, mapC, mapCLR, mapCRL, mapCS, mapL, mapR, mapS, mapWholeCLR, mapWholeCRL, mapWholeCS, mapWholeL, mapWholeR, mapWholeS)
 
 import Pivot.Get exposing (..)
 import Pivot.Position exposing (..)

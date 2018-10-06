@@ -1,12 +1,4 @@
-module Pivot.Find
-    exposing
-        ( findCL
-        , findCR
-        , findL
-        , findR
-        , firstWith
-        , lastWith
-        )
+module Pivot.Find exposing (findCL, findCR, findL, findR, firstWith, lastWith)
 
 import Pivot.Get exposing (..)
 import Pivot.Position exposing (..)
