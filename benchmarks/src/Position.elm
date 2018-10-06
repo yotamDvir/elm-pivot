@@ -11,11 +11,8 @@ main =
     Benchmark.Runner.program <|
         Benchmark.describe "Pivot.Position"
             [ lengthL
-            , lengthLOptimized
             , lengthR
-            , lengthROptimized
             , lengthA
-            , lengthAOptimized
             ]
 
 
@@ -30,26 +27,11 @@ lengthL =
     benchmark "lengthL" (\_ -> Pivot.Position.lengthL pivot1000)
 
 
-lengthLOptimized : Benchmark
-lengthLOptimized =
-    benchmark "lengthL optimized" (\_ -> Pivot.Position.lengthLOptimized pivot1000)
-
-
 lengthR : Benchmark
 lengthR =
     benchmark "lengthR" (\_ -> Pivot.Position.lengthR pivot1000)
 
 
-lengthROptimized : Benchmark
-lengthROptimized =
-    benchmark "lengthR optimized" (\_ -> Pivot.Position.lengthROptimized pivot1000)
-
-
 lengthA : Benchmark
 lengthA =
     benchmark "lengthA" (\_ -> Pivot.Position.lengthA pivot1000)
-
-
-lengthAOptimized : Benchmark
-lengthAOptimized =
-    benchmark "lengthA optimized" (\_ -> Pivot.Position.lengthAOptimized pivot1000)

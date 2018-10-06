@@ -11,11 +11,8 @@ main =
     Benchmark.Runner.program <|
         Benchmark.describe "Pivot.Get"
             [ hasL
-            , hasLOptimized
             , hasR
-            , hasROptimized
             , getA
-            , getAOptimized
             ]
 
 
@@ -30,26 +27,11 @@ hasL =
     benchmark "hasL" (\_ -> Pivot.Get.hasL pivot1000)
 
 
-hasLOptimized : Benchmark
-hasLOptimized =
-    benchmark "hasL optimized" (\_ -> Pivot.Get.hasLOptimized pivot1000)
-
-
 hasR : Benchmark
 hasR =
     benchmark "hasR" (\_ -> Pivot.Get.hasR pivot1000)
 
 
-hasROptimized : Benchmark
-hasROptimized =
-    benchmark "hasR optimized" (\_ -> Pivot.Get.hasROptimized pivot1000)
-
-
 getA : Benchmark
 getA =
     benchmark "getA" (\_ -> Pivot.Get.getA pivot1000)
-
-
-getAOptimized : Benchmark
-getAOptimized =
-    benchmark "getA optimized" (\_ -> Pivot.Get.getAOptimized pivot1000)

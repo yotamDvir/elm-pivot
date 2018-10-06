@@ -1,4 +1,4 @@
-module Pivot.Position exposing (goAbsolute, goL, goR, goRelative, goToEnd, goToStart, lengthA, lengthAOptimized, lengthL, lengthLOptimized, lengthR, lengthROptimized)
+module Pivot.Position exposing (goAbsolute, goL, goR, goRelative, goToEnd, goToStart, lengthA, lengthL, lengthR)
 
 import Pivot.Get exposing (..)
 import Pivot.Types exposing (..)
@@ -53,30 +53,15 @@ goToEnd =
 
 
 lengthL : Pivot a -> Int
-lengthL =
-    getL >> List.length
-
-
-lengthLOptimized : Pivot a -> Int
-lengthLOptimized (Pivot _ ( l, _ )) =
+lengthL (Pivot _ ( l, _ )) =
     List.length l
 
 
 lengthR : Pivot a -> Int
-lengthR =
-    getR >> List.length
-
-
-lengthROptimized : Pivot a -> Int
-lengthROptimized (Pivot _ ( _, r )) =
+lengthR (Pivot _ ( _, r )) =
     List.length r
 
 
 lengthA : Pivot a -> Int
-lengthA =
-    getA >> List.length
-
-
-lengthAOptimized : Pivot a -> Int
-lengthAOptimized (Pivot _ ( l, r )) =
+lengthA (Pivot _ ( l, r )) =
     List.length l + 1 + List.length r
