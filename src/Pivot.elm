@@ -1,7 +1,7 @@
 module Pivot exposing
     ( Pivot
     , fromList, fromCons, singleton
-    , getC, getL, getR, getA, hasL, hasR
+    , getC, getL, getR, getA, toList, hasL, hasR
     , lengthL, lengthR, lengthA
     , goR, goL, goRelative, goBy, goAbsolute, goTo, goToStart, goToEnd
     , firstWith, lastWith, findR, findL, findCR, findCL
@@ -14,7 +14,6 @@ module Pivot exposing
     , mapWholeCLR, mapWholeCRL, mapWholeCS, mapWholeS, mapWholeL, mapWholeR
     , indexAbsolute, indexRelative, apply
     , reverse, mirror, mirrorM, assert, withRollback
-    , toList
     )
 
 {-| A pivot is a list upgraded with a center and sides. However, a pivot
@@ -52,7 +51,7 @@ So you want to use a pivot? Better know how to create one, and get stuff back!
 
 ## Get
 
-@docs getC, getL, getR, getA, hasL, hasR
+@docs getC, getL, getR, getA, toList, hasL, hasR
 
 
 # Movement
