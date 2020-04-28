@@ -18,8 +18,8 @@ setL l_ (Pivot c ( l, r )) =
 
 
 setR : List a -> Pivot a -> Pivot a
-setR r_ =
-    setL r_ |> mirror
+setR r_ (Pivot c ( l, r )) =
+    Pivot c ( l, r_ )
 
 
 switchL : Pivot a -> Maybe (Pivot a)
