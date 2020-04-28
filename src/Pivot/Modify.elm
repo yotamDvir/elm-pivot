@@ -12,11 +12,25 @@ setC c_ (Pivot c ( l, r )) =
     Pivot c_ ( l, r )
 
 
+{-|
+
+    setL [ 1, 2, 3 ] [ 99 * 4 * 5 ] == [ 1 2 3 * 4 * 5 ]
+
+    getL >> setL == identity
+
+-}
 setL : List a -> Pivot a -> Pivot a
 setL l_ (Pivot c ( l, r )) =
     Pivot c ( List.reverse l_, r )
 
 
+{-|
+
+    setR [ 3, 4, 5 ] [ 1 * 2 * 99 ] == [ 1 * 2 * 3 4 5 ]
+
+    getR >> setR == identity
+
+-}
 setR : List a -> Pivot a -> Pivot a
 setR r_ (Pivot c ( l, r )) =
     Pivot c ( l, r_ )
