@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) post.
 
+## [4.0.0] - 2020-05-05
+
+### Fixed
+
+- [#17](https://github.com/yotamDvir/elm-pivot/pull/17) **BREAKING**: `setR` no longer reverses the list that it is setting in the pivot. For an immediate fix, replace `setR` with `(List.reverse >> setR)`.
+
 ## [3.1.0] - 2018-10-06
 
 ### Added
@@ -13,6 +19,7 @@ The format is based on the [Keep a Changelog](https://keepachangelog.com/en/1.0.
 ### Changed
 
 - [#13](https://github.com/yotamDvir/elm-pivot/pull/13) Performance: `has*`, `getA` (`toList`), `length*` optimized.
+
 ## [3.0.0] - 2018-09-07
 
 **Updated to [Elm 0.19](https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md)!**
