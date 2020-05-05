@@ -441,6 +441,11 @@ setC =
 
 
 {-| Replace the left.
+
+    setL [ 1, 2, 3 ] [ 99 * 4 * 5 ] == [ 1 2 3 * 4 * 5 ]
+
+    getL >> setL == identity
+
 -}
 setL : List a -> Pivot a -> Pivot a
 setL =
@@ -448,6 +453,11 @@ setL =
 
 
 {-| Replace the right.
+
+    setR [ 3, 4, 5 ] [ 1 * 2 * 99 ] == [ 1 * 2 * 3 4 5 ]
+
+    getR >> setR == identity
+
 -}
 setR : List a -> Pivot a -> Pivot a
 setR =
